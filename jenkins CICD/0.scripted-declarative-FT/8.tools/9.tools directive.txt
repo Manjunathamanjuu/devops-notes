@@ -1,0 +1,96 @@
+tools
+A section defining tools to auto-install and put on the PATH. This is ignored if agent none is specified.
+
+Required
+
+No
+
+Parameters
+
+None
+
+Allowed
+
+Inside the pipeline block or a stage block.
+
+Supported Tools
+maven
+jdk
+gradle
+
+Example 13. Tools, Declarative Pipeline
+pipeline {
+    agent any
+    tools {
+        maven 'apache-maven-3.0.1' 
+    }
+    stages {
+        stage('Example') {
+            steps {
+                sh 'mvn --version'
+            }
+        }
+    }
+}
+The tool name must be pre-configured in Jenkins under Manage Jenkins → Tools.
+
+
+pipeline {
+    agent any
+    tools {
+        maven 'M2_HOME' 
+    }
+    stages {
+        stage('Example') {
+            steps {
+                sh 'mvn --version'
+            }
+        }
+    }
+}
+
+==
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+		    tools {
+				maven 'm2_392' 
+				//maven 'maven3_0_5' 
+			}
+            steps {
+                sh 'mvn --version'
+            }
+        }
+    }
+}
+
+===
+
+scripted tools
+===============
+
+node{
+	def mavenHome = tool name: 'maven3_0_5', type: 'maven'
+    sh "${mavenHome}/bin/mvn -v"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

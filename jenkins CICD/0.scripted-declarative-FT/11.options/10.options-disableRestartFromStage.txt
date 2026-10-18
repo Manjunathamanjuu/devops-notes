@@ -1,0 +1,55 @@
+disableRestartFromStage
+========================
+Completely disable option "Restart From Stage" visible in classic Jenkins UI and Blue Ocean as well.
+
+ For example: options { disableRestartFromStage() }. This option can not be used inside of the stage.
+
+pipeline {
+  agent any
+  stages {
+   stage("stage1"){
+      steps {
+        sh "echo stage1"
+      }
+   }
+   stage("stage2"){
+      steps {
+        sh "echo stage2"
+      }
+   }
+   stage("stage3"){
+      steps {
+        sh "echo stage3"
+      }
+   }
+  }
+}
+
+we can see Restart from stage option on clicking green build.
+
+Now add options { disableRestartFromStage() }.
+
+
+pipeline {
+  agent any
+  options { disableRestartFromStage() }
+  stages {
+   stage("stage1"){
+      steps {
+        sh "echo stage1"
+      }
+   }
+   stage("stage2"){
+      steps {
+        sh "echo stage2"
+      }
+   }
+   stage("stage3"){
+      steps {
+        sh "echo stage3"
+      }
+   }
+  }
+}
+
+this one will remove option from current build and as well as from previous builds.

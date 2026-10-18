@@ -1,0 +1,105 @@
+disableResume
+==============
+Do not allow the pipeline to resume if the controller restarts. For example: options { disableResume() }
+
+In Jenkins, the disableResume option is used in conjunction with the checkout step to prevent Jenkins from attempting to resume a partially completed pipeline run from a checkpoint. 
+
+This can be useful in situations where you want to ensure that a pipeline always starts from scratch, even if a previous run was interrupted.
+
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+               git 'https://github.com/bhanuprakash678910/mavenproj.git'
+            }
+        }
+    }
+    options {
+        disableResume()
+    }
+}
+
+
+==
+
+pipeline {
+    agent any
+    stages {
+        stage('init1') {
+            steps {
+               echo "HI"
+            }
+        }
+        stage('init2') {
+            steps {
+               echo "HELLO"
+               sleep 40
+            }
+        }
+        stage('init3') {
+            steps {
+               echo "BYE"
+            }
+        }
+    }
+   
+}
+
+restart jenkins after click on build now.
+
+check the job status
+
+Resuming build at Sat Nov 04 17:37:57 UTC 2023 after Jenkins restart
+No need to sleep any longer
+Ready to run at Sat Nov 04 17:37:57 UTC 2023
+
+==
+
+pipeline {
+    agent any
+     options {
+        disableResume()
+    }
+    stages {
+        stage('init1') {
+            steps {
+               echo "HI"
+            }
+        }
+        stage('init2') {
+            steps {
+               echo "HELLO"
+               sleep 40
+            }
+        }
+        stage('init3') {
+            steps {
+               echo "BYE"
+            }
+        }
+    }
+}
+
+Do not allow the pipeline to resume if the controller restarts got checked.
+
+build and restart jenkins and see the output of the job.
+
+Failing build: shutting down controller and build is marked to not resume
+Terminating sleep
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (init3)
+java.io.IOException: Cannot resume build -- was not cleanly saved when Jenkins shut down.
+	at org.jenkinsci.plugins.workflow.cps.CpsFlowExecution.onLoad(CpsFlowExecution.java:830)
+
+post build manual
+==================
+Started by user admin
+Resume disabled by user, switching to high-performance, low-durability mode.
+[Pipeline] Start of Pipeline
+
+
+
+

@@ -1,0 +1,97 @@
+| #  | Resource / File        | Interview Answer                                                                                                          |                                            |
+| -- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | 
+| 1  | **Namespace**          | Namespace is used to logically isolate and organize Kubernetes resources within a cluster. 
+                                                                                 | **ಒಂದೇ cluster ಒಳಗೆ resources ಅನ್ನು ಬೇರೆ ಬೇರೆ groups ಆಗಿ manage ಮಾಡಲು Namespace ಬಳಸುತ್ತೇವೆ.** 
+                   |
+| 2  | **Deployment**         | Deployment manages stateless application Pods and provides scaling, rolling updates, and rollback.
+                              | **Application Pods ಎಷ್ಟು ಇರಬೇಕು ಮತ್ತು update ಹೇಗೆ ಮಾಡಬೇಕು ಅನ್ನುವುದನ್ನು Deployment manage ಮಾಡುತ್ತದೆ.**
+            |
+| 3  | **Service**            | Service provides a stable network endpoint to access a group of Pods.
+                              | **Pod IP ಬದಲಾದರೂ application ಅನ್ನು stable address ಮೂಲಕ access ಮಾಡಲು Service ಸಹಾಯ ಮಾಡುತ್ತದೆ.**
+                    |
+| 4  | **StatefulSet**        | StatefulSet is used for stateful applications such as PostgreSQL and provides stable Pod identity and persistent storage.
+                              | **Database ರೀತಿಯ applications ಗೆ stable Pod name ಮತ್ತು storage ಬೇಕಾದಾಗ StatefulSet ಬಳಸುತ್ತೇವೆ.** 
+                |
+| 5  | **Headless Service**   | A Headless Service has `clusterIP: None` and provides direct DNS-based discovery of individual Pods.
+                              | **Headless Service virtual IP ಕೊಡದೆ individual Pods ಅನ್ನು DNS ಮೂಲಕ identify ಮಾಡಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.**
+              |
+| 6  | **PVC**                | PersistentVolumeClaim is a request for persistent storage by an application.
+                              | **Application ಗೆ ಬೇಕಾದ permanent storage ಅನ್ನು request ಮಾಡಲು PVC ಬಳಸುತ್ತೇವೆ.** 
+                                  |
+| 7  | **ConfigMap**          | ConfigMap stores non-sensitive configuration such as URLs, environment variables, and application settings.
+                              | **Password ಅಲ್ಲದ configuration data ಅನ್ನು ConfigMap ನಲ್ಲಿ store ಮಾಡುತ್ತೇವೆ.** 
+                                   |
+| 8  | **Secret**             | Secret stores sensitive information such as passwords, tokens, and API keys
+.                             | **Password ಮತ್ತು API key ತರಹದ sensitive information ಅನ್ನು Secret ನಲ್ಲಿ store ಮಾಡುತ್ತೇವೆ.**
+                       |
+| 9  | **TLS Secret**         | TLS Secret stores the TLS certificate and private key required for HTTPS communication. 
+                              | **HTTPS connection ಗಾಗಿ certificate ಮತ್ತು private key ಅನ್ನು TLS Secret ನಲ್ಲಿ ಇಡುತ್ತೇವೆ.**
+                        |
+| 10 | **GatewayClass**       | GatewayClass defines which Gateway controller will manage a Gateway.
+                                                                                 | **ಯಾವ Gateway controller ನಮ್ಮ Gateway ಅನ್ನು manage ಮಾಡಬೇಕು ಎಂದು GatewayClass ನಿರ್ಧರಿಸುತ್ತದೆ.**  
+                 |
+| 11 | **Gateway**            | Gateway provides the network entry point and defines listeners, ports, protocols, and TLS configuration.
+                              | **External traffic Kubernetes application ಒಳಗೆ ಬರಲು Gateway ಒಂದು entry point ಆಗಿ ಕೆಲಸ ಮಾಡುತ್ತದೆ.** 
+              |
+| 12 | **External Gateway**   | An External Gateway exposes the application outside the cluster through an external load balancer.
+                              | **Cluster ಹೊರಗಿನಿಂದ application ಅನ್ನು access ಮಾಡಲು External Gateway ಬಳಸಬಹುದು.**   
+                               |
+| 13 | **HTTPRoute**          | HTTPRoute defines how incoming HTTP/HTTPS requests are routed to backend Services.
+                                                                                 | **ಬರುವ request ಯಾವ Service ಗೆ ಹೋಗಬೇಕು ಎಂದು HTTPRoute ನಿರ್ಧರಿಸುತ್ತದೆ.**
+                                           |
+| 14 | **ClusterRoleBinding** | ClusterRoleBinding grants the permissions of a ClusterRole to a user, group, or ServiceAccount.
+                                                                                  | **ಒಂದು ClusterRole ನ permissions ಅನ್ನು user ಅಥವಾ ServiceAccount ಗೆ assign ಮಾಡಲು ClusterRoleBinding ಬಳಸುತ್ತೇವೆ.** |
+
+| 15 | **Chart.yaml**         | Chart.yaml contains the metadata of a Helm chart, such as name, version, and app version.
+                              | **Helm chart ಬಗ್ಗೆ basic information ಮತ್ತು version details ಅನ್ನು Chart.yaml ನಲ್ಲಿ ಇಡುತ್ತೇವೆ.*
+*                   |
+| 16 | **values.yaml**        | values.yaml contains configurable values used by Helm templates.
+                              | **Hardcoded values ಬದಲು configurable values ಅನ್ನು values.yaml ನಲ್ಲಿ ಇಡುತ್ತೇವೆ.**   
+                              |
+| 17 | **templates/**         | The templates directory contains parameterized Kubernetes YAML manifests used by Helm.
+                              | **Kubernetes YAML files ಅನ್ನು dynamic ಆಗಿ generate ಮಾಡಲು templates directory ಬಳಸುತ್ತೇವೆ.**                       |
+
+
+
+
+1. Kubernetes Architecture
+          ↓
+2. Pods
+          ↓
+3. Deployment
+          ↓
+4. ReplicaSet
+          ↓
+5. Services
+          ↓
+6. Ingress / Gateway API
+          ↓
+7. ConfigMap
+          ↓
+8. Secrets
+          ↓
+9. PV / PVC
+          ↓
+10. StorageClass
+          ↓
+11. Probes
+          ↓
+12. Requests / Limits
+          ↓
+13. Scheduling
+          ↓
+14. Taints / Tolerations
+          ↓
+15. Affinity / Anti-Affinity
+          ↓
+16. RBAC
+          ↓
+17. NetworkPolicy
+          ↓
+18. Helm
+          ↓
+19. HPA
+          ↓
+20. Troubleshooting
+          ↓
+21. Production Scenarios

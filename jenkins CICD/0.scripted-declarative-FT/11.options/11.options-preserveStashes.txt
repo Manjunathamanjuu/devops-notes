@@ -1,0 +1,124 @@
+preserveStashes
+=================
+Preserve stashes from completed builds, for use with stage restarting.
+
+
+1. Default Behavior: By default, Jenkins clears stashes at the end of the pipeline or when they are used (unstashed). This can lead to lost data if the same stash needs to be reused.
+
+2. Purpose of preserveStashes(): This option ensures that stashes remain available throughout the pipeline's execution, even after they are used (unstashed).
+
+When to Use:
+- When multiple stages in your pipeline need to access the same stashed content.
+- To avoid redundancy and improve pipeline performance by stashing files once and reusing them in subsequent stages.
+  
+Caveats:
+- Overusing `preserveStashes()` may increase storage requirements on the Jenkins master or agents.
+- Ensure proper cleanup of stashes manually if needed.
+
+ For example: 
+
+options { preserveStashes() } to preserve the stashes from the most recent completed build, or
+
+ options { preserveStashes(buildCount: 5) } to preserve the stashes from the five most recent completed builds.
+
+pipeline {  
+    agent { label 'slave-redhat' }
+    options {  
+        preserveStashes(buildCount: 1)
+    }
+    stages {    
+        stage('one') {  
+            steps {
+                sh "mkdir input"
+                writeFile file: "input/myfile${BUILD_NUMBER}", text: "Hello world!"
+                stash name: "mystash", includes: "input/*"
+                sh "rm -r input"
+            }  
+        }  
+        stage('two') {  
+            steps {
+                sh "mkdir output"
+                dir("output") {
+                    unstash "mystash"
+                    sh "ls -lR ${pwd()}"
+                }
+                sh "rm -r output"
+            }  
+        }  
+    }  
+}
+
+==
+
+Observe, we were successfully able to unstash in stage two, now restart only stage “two”.
+
+Observe, we are still able to unstash in stage two.
+
+Now remove the option block from the pipeline and rerun the pipeline.
+
+pipeline {  
+    agent { label 'slave-redhat' }
+    stages {    
+        stage('one') {  
+            steps {
+                sh "mkdir input"
+                writeFile file: "input/myfile${BUILD_NUMBER}", text: "Hello world!"
+                stash name: "mystash", includes: "input/*"
+                sh "rm -r input"
+            }  
+        }  
+        stage('two') {  
+            steps {
+                sh "mkdir output"
+                dir("output") {
+                    unstash "mystash"
+                    sh "ls -lR ${pwd()}"
+                }
+                sh "rm -r output"
+            }  
+        }  
+    }  
+}
+
+The pipeline will get executed successfully for the first time. Now try to restart stage “two”.
+
+Observe, you get an error since stash in stage “one” was not preserved, hence not available in stage “two” when restart stage “two”.
+
+
+The `{ preserveStashes() }` option is commonly used in tools like Jenkins Pipelines, specifically in **Declarative Pipelines**, to control how stashed files are handled between pipeline stages. It ensures that stashes are not cleared automatically, allowing them to persist across multiple stages.
+
+
+pipeline {
+    options {
+        preserveStashes()
+    }
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    stash name: 'source', includes: '**/*'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    unstash 'source'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    unstash 'source'
+                }
+            }
+        }
+    }
+}
+```
+
+
+
+
+

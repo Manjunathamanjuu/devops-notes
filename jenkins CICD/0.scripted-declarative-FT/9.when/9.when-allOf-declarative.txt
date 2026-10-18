@@ -1,0 +1,52 @@
+allOf
+=====
+Execute the stage when all of the nested conditions are true. Must contain at least one condition. For example: 
+
+when { allOf { branch 'master'; environment name: 'DEPLOY_TO', value: 'production' } }
+
+when-allOf
+===========
+pipeline {
+    agent any
+	environment{
+		version="1.0"
+		some_name="sai"
+	}
+    stages {
+        stage("Build") {
+            when {
+                allOf { 
+					environment name: "version", value: "1.0"
+					environment name: "some_name", value: "sai"
+				}
+            }
+            steps {
+                echo "Building allOf ${version} ${some_name}"
+            }
+        }
+    }
+}
+==
+Example 17. Nested condition (same behavior as previous example)
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                allOf {
+                    branch 'production'
+                    environment name: 'DEPLOY_TO', value: 'production'
+                }
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+==

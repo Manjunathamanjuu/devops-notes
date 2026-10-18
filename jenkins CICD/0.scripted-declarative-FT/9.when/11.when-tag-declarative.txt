@@ -1,0 +1,42 @@
+when-tag
+=========
+Execute the stage if the TAG_NAME variable matches the given pattern. For example: 
+when { tag "release-*" } 
+
+If an empty pattern is provided the stage will execute if the TAG_NAME variable exists (same as buildingTag()).
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: * EQUALS for a simple string comparison, * GLOB (the default) for an ANT style path glob (same as for example changeset), or * REGEXP for regular expression matching. For example: 
+
+when { tag pattern: "release-\\d+", comparator: "REGEXP"}
+
+
+create multi branch pipeline job with additional properties "discover tags".
+
+https://github.com/bhanuprakash678910/multibranch-tag.git
+
+
+$ git tag Rel-1.0
+
+$ git push origin --tags
+
+scan repo log and found tag Rel-1.0 branch is build. build this job.
+
+Build master and observe it skipped when conditional.
+
+
+change code in tag:
+
+pipeline {
+    agent any
+    stages {
+        stage("Build Master") {
+            when {
+              tag "Rel-1.0"
+            }
+            steps {
+                echo "Hello World Building Tag"
+            }
+        }
+    }
+  }
+

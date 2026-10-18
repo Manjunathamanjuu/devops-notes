@@ -1,0 +1,62 @@
+skipStagesAfterUnstable
+=========================
+Skip stages once the build status has gone to UNSTABLE. For example: options { skipStagesAfterUnstable() }
+
+
+pipeline{	
+    agent any	
+    //options { 
+	//	skipStagesAfterUnstable() 
+	//} 	
+    stages{	
+        stage('Build'){	
+            steps{	
+                echo "setting current build to unstable"	
+                script {	
+                    currentBuild.result = 'UNSTABLE'	
+                }	
+            }	
+        }	
+        stage('Deploy'){	
+            steps{	
+                echo "deploy is running"	
+            }	
+        }        	
+    }	
+}	
+
+uncomment options and run again.
+
+now Stage "Deploy" skipped due to earlier stage(s) marking the build as unstable
+
+==
+
+without 
+========
+node{	
+	stage('Build'){	
+		echo "setting current build to unstable"	
+        currentBuild.result = 'UNSTABLE'	
+    }	
+	
+		stage('Deploy'){	
+			echo "deploy is running"	
+		}
+}
+==
+
+with
+=====
+
+node{	
+	stage('Build'){	
+		echo "setting current build to unstable"	
+        currentBuild.result = 'UNSTABLE'	
+    }	
+	
+	if(currentBuild.result != 'UNSTABLE'){
+		stage('Deploy'){	
+			echo "deploy is running"	
+		}
+	}
+}

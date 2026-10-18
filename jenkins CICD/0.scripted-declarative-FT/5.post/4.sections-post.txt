@@ -1,0 +1,508 @@
+post section
+=============
+
+The post section defines one or more additional steps that are run upon the completion of a Pipeline’s or stage’s run (depending on the location of the post section within the Pipeline). post can support any of the following post-condition blocks: always, changed, fixed, regression, aborted, failure, success, unstable, unsuccessful, and cleanup. These condition blocks allow the execution of steps inside each condition depending on the completion status of the Pipeline or stage. The condition blocks are executed in the order shown below.
+
+Required
+
+No
+
+Parameters
+
+None
+
+Allowed
+
+In the top-level pipeline block and each stage block.
+  
+Conditions
+==========
+1)
+post section - always
+Run the steps in the post section regardless of the completion status of the Pipeline’s or stage’s run.
+
+2)
+post section -- changed
+Only run the steps in post if the current Pipeline’s run has a different completion status from its previous run.
+
+3)
+post section- failure
+Only run the steps in post if the current Pipeline’s or stage’s run has a "failed" status, typically denoted by red in the web UI.
+
+4)
+success
+Only run the steps in post if the current Pipeline’s or stage’s run has a "success" status, typically denoted by blue or green in the web UI.
+
+5)
+fixed
+Only run the steps in post if the current Pipeline’s run is successful and the previous run failed or was unstable.
+
+6)
+regression
+Only run the steps in post if the current Pipeline’s or status is failure, unstable, or aborted and the previous run was successful.
+
+7) 
+aborted
+Only run the steps in post if the current Pipeline’s run has an "aborted" status, usually due to the Pipeline being manually aborted. This is typically denoted by gray in the web UI.
+
+8)
+unstable
+Only run the steps in post if the current Pipeline’s run has an "unstable" status, usually caused by test failures, code violations, etc. This is typically denoted by yellow in the web UI.
+
+9) 
+
+unsuccessful
+Only run the steps in post if the current Pipeline’s or stage’s run has not a "success" status. This is typically denoted in the web UI depending on the status previously mentioned (for stages this may fire if the build itself is unstable).
+
+10)
+===
+cleanup
+Run the steps in this post condition after every other post condition has been evaluated, regardless of the Pipeline or stage’s status.
+
+
+post with always
+=================
+Run the steps in the post section regardless of the completion status of the Pipeline’s or stage’s run.
+
+
+pipeline {
+    agent any
+    stages {
+        stage('Example1') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+         stage('Example2') {
+            steps {
+                sh 'touch file1'
+            }
+        }
+         stage('Example3') {
+            steps {
+               touch file2
+            }
+        }
+    }
+    post { 
+        always { 
+            echo 'I will always say Hello again!'
+        }
+    }
+}
+
+==
+
+post with success-failure-cleanup - unstable
+=============================================
+success
+Only run the steps in post if the current Pipeline’s or stage’s run has a "success" status, typically denoted by blue or green in the web UI.
+
+failure
+Only run the steps in post if the current Pipeline’s or stage’s run has a "failed" status, typically denoted by red in the web UI.
+
+cleanup
+Run the steps in this post condition after every other post condition has been evaluated, regardless of the Pipeline or stage’s status.
+
+unstable
+Only run the steps in post if the current Pipeline’s run has an "unstable" status, usually caused by test failures, code violations, etc. This is typically denoted by yellow in the web UI.
+
+
+pipeline {
+    agent any
+    stages {
+        stage('Example1') {
+            steps {
+                sh 'touch file1'
+            }
+        }
+         stage('Example2') {
+            steps {
+                sh 'touch file2'
+            }
+        }
+         stage('Example3') {
+            steps {
+                sh 'touch file3'
+            }
+        }
+    }
+    post { 
+        success { 
+            echo 'I am successful!'
+        }
+        failure { 
+            echo 'I am failure!'
+         }
+        cleanup { 
+            sh 'rm -r file1'
+         }
+    }
+}
+
+post {
+  unstable {
+    echo "i am unstable"
+  }
+}
+==
+
+post - Always-success-failure
+---------------------
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+                    //error("Build failed")
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run has a "success" status
+		success{
+			echo 'post->success is called'
+		}
+		//Only runs if the current Pipeline’s or stage’s run has a "failed" status
+		failure { 
+            echo 'post->failure is called'
+        }
+		//Runs regardless of the completion status of the Pipeline’s or stage’s run.
+        always { 
+            echo 'post->always is called'
+        }
+    }
+}
+
+===
+
+changed 
+-------------
+Only run the steps in post if the current Pipeline’s run has a different completion status from its previous run.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"					
+					//script{
+					//	currentBuild.result = 'UNSTABLE'
+					//}
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run has a different completion status from its previous run.
+        changed { 
+            echo 'post->changed is called'
+        }
+    }
+}
+
+==
+
+unstable
+---------
+Only run the steps in post if the current Pipeline’s run has an "unstable" status, usually caused by test failures, code violations, etc. This is typically denoted by yellow in the web UI.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"					
+					//script{
+					//	currentBuild.result = 'UNSTABLE'
+					//}
+            }
+        }
+    }
+    post{
+		//Only run the steps in post if the current Pipeline’s or stage’s run has an "unstable" status, usually caused by test failures, code violations, etc. 
+		unstable { 
+            echo 'post->unstable is called'
+        }
+    }
+}
+==
+fixed
+------
+Only run the steps in post if the current Pipeline’s run is successful and the previous run failed or was unstable.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run is successful and the previous run failed or was unstable.
+		fixed { 
+            echo 'post->fixed is called'
+        }
+    }
+}
+
+==
+regression
+-----------
+Only run the steps in post if the current Pipeline’s or status is failure, unstable, or aborted and the previous run was successful.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+					error("Build failed")
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s status is failure, unstable, or aborted and the previous run was successful.
+		regression { 
+            echo 'post->regression is called'
+        }
+    }
+}
+==
+aborted
+-------
+Only run the steps in post if the current Pipeline’s run has an "aborted" status, usually due to the Pipeline being manually aborted. This is typically denoted by gray in the web UI.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+					script{
+						currentBuild.result = 'ABORTED'
+					}
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run has an "aborted" status, usually due to the Pipeline being manually aborted. 
+		aborted { 
+            echo 'post->aborted is called'
+        }
+    }
+}
+
+==
+
+unsuccessful
+Only run the steps in post if the current Pipeline’s or stage’s run has not a "success" status. This is typically denoted in the web UI depending on the status previously mentioned (for stages this may fire if the build itself is unstable).
+===
+
+------------
+example 1
+------------
+node {
+    try {
+        stage('Build') {
+            script{
+				currentBuild.result = 'SUCCESS' //SUCCESS, ABORTED, UNSTABLE, or FAILURE
+			}
+        }
+    }
+	catch(err)
+	{
+		//does nothing here
+	}
+	finally {
+	
+		def currentResult = currentBuild.result
+		//this section is always
+		echo "always() code is executed"
+
+		//changed
+		if(currentBuild.previousBuild != null){
+			def previousResult = currentBuild.previousBuild.result
+			if (previousResult != null && previousResult != currentResult) {
+				echo 'changed() code is executed'
+			}
+		}
+
+		//fixed
+		if(currentBuild.previousBuild != null){
+			def previousResult = currentBuild.previousBuild.result
+			if (previousResult != null && ( previousResult == 'FAILURE' 
+				|| currentResult == 'UNSTABLE' ) 
+				&& currentResult=='SUCCESS') {
+				echo 'fixed() code is executed'
+			}
+		}
+				
+		//regression
+		if(currentBuild.previousBuild != null){
+			def previousResult = currentBuild.previousBuild.result
+			if (previousResult != null && ( currentResult == 'FAILURE' 
+				|| currentResult == 'UNSTABLE' 
+				|| currentResult == 'ABORTED') 
+				&& previousResult=='SUCCESS') {
+				echo 'regression() code is executed'
+			}
+		}		
+		
+		//aborted
+        if (currentResult == 'ABORTED') {
+            echo 'aborted() code is executed'
+        }
+		
+		//failure        
+        if (currentResult == 'FAILURE') {
+            echo 'failure() code is executed'
+        }
+
+	    //unstable
+
+        if (currentResult == 'SUCCESS') {
+            echo 'success() code is executed'
+        }		
+		
+	    //unstable
+        if (currentResult == 'UNSTABLE') {
+            echo 'unstable() code is executed'
+        }
+		
+		//cleanup
+		echo "cleanup() code is executed"
+    }
+}
+
+------------
+example 2
+------------
+
+node {
+
+    stage('Build') {
+		try {
+			script{
+				currentBuild.result = 'SUCCESS' //ABORTED, SUCCESS, UNSTABLE, or FAILURE
+			}
+        }
+		catch(err)
+		{
+			//does nothing here
+		}
+		finally {
+		
+			def currentResult = currentBuild.result
+			//this section is always
+			echo "always() code is executed"
+
+			//changed
+			if(currentBuild.previousBuild != null){
+				def previousResult = currentBuild.previousBuild.result
+				if (previousResult != null && previousResult != currentResult) {
+					echo 'changed() code is executed'
+				}
+			}
+
+			//fixed
+			if(currentBuild.previousBuild != null){
+				def previousResult = currentBuild.previousBuild.result
+				if (previousResult != null && ( previousResult == 'FAILURE' 
+					|| currentResult == 'UNSTABLE' ) 
+					&& currentResult=='SUCCESS') {
+					echo 'fixed() code is executed'
+				}
+			}
+					
+			//regression
+			if(currentBuild.previousBuild != null){
+				def previousResult = currentBuild.previousBuild.result
+				if (previousResult != null && ( currentResult == 'FAILURE' 
+					|| currentResult == 'UNSTABLE' 
+					|| currentResult == 'ABORTED') 
+					&& previousResult=='SUCCESS') {
+					echo 'regression() code is executed'
+				}
+			}		
+			
+			//aborted
+			if (currentResult == 'ABORTED') {
+				echo 'aborted() code is executed'
+			}
+			
+			//failure        
+			if (currentResult == 'FAILURE') {
+				echo 'failure() code is executed'
+			}
+
+			//unstable
+
+			if (currentResult == 'SUCCESS') {
+				echo 'success() code is executed'
+			}		
+			
+			//unstable
+			if (currentResult == 'UNSTABLE') {
+				echo 'unstable() code is executed'
+			}
+			
+			//cleanup
+			echo "cleanup() code is executed"
+		}
+	}
+	
+	stage('Deploy') {
+		echo 'This is Deploy stage'
+	}
+}
+
+==
+
+Email Notification-post always
+==============================
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                echo "Hello world"
+                    }
+            }
+        }
+    post{
+        always{
+            mail to: "bhanuprakashdevopsaws2019k@gmail.com",
+            subject: "Test Email",
+            body: "test"
+        }
+    }
+}
+
+Email Notification-post failure
+================================
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                echoo "Hello world"
+                    }
+            }
+        }
+    post{
+        failure{
+            mail to: "bhanuprakashdevopsaws2019k@gmail.com",
+            subject: "jenkins build:${currentBuild.currentResult}: ${env.JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\nMore Info can be found here: ${env.BUILD_URL}"
+        }
+    }
+}
+
+
+
+
+

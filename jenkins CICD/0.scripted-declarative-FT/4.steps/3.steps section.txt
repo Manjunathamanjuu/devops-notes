@@ -1,0 +1,29 @@
+steps
+The steps section defines a series of one or more steps to be executed in a given stage directive.
+
+Required
+
+Yes
+
+Parameters
+
+None
+
+Allowed
+
+Inside each stage block.
+
+Example 5. Single Step, Declarative Pipeline
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            steps { 
+                echo 'Hello World'
+            }
+        }
+    }
+}
+The steps section must contain one or more steps.
+
+Step section should contain LOGIC.

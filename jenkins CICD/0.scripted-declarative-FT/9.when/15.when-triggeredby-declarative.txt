@@ -1,0 +1,87 @@
+triggeredBy
+============
+Execute the stage when the current build has been triggered by the param given. For example:
+
+when { triggeredBy 'SCMTrigger' }
+
+when { triggeredBy 'TimerTrigger' }
+
+when { triggeredBy 'BuildUpstreamCause' }
+
+when { triggeredBy cause: "UserIdCause", detail: "sai" }
+
+
+Example . triggeredBy
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                triggeredBy "TimerTrigger"
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+when we add crons: deploy stage will trigger on timer.
+
+pipeline {
+    agent any
+    triggers {
+    cron('* * * * *')    
+    }
+    
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                triggeredBy "TimerTrigger"
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+
+====
+poll scm
+===========
+
+pipeline {
+    agent any 
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+           
+             when { 
+               triggeredBy 'SCMTrigger' 
+            }
+
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+set job as poll scm and set via github.
+
+

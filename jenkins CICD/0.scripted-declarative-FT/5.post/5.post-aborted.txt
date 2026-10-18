@@ -1,0 +1,45 @@
+aborted
+-------
+Only run the steps in post if the current Pipeline’s run has an "aborted" status, usually due to the Pipeline being manually aborted. This is typically denoted by gray in the web UI.
+
+pipeline {
+    agent any
+    stages {
+        stage('Build'){
+            steps{
+                    echo "building"
+					script{
+						currentBuild.result = 'ABORTED'
+					}
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run has an "aborted" status, usually due to the Pipeline being manually aborted. 
+		aborted { 
+            echo 'post->aborted is called'
+        }
+    }
+}
+
+==
+
+
+pipeline {
+    agent any
+    stages {
+        stage('Build'){
+            steps{
+                    sh 'sleep 300'
+	      }
+         }
+      }
+    post  {
+		//Only runs if the current Pipeline’s or stage’s run has an "aborted" status, usually due to the Pipeline being manually aborted. 
+		aborted { 
+            echo 'post->aborted is called'
+        }
+     }
+}
+
+

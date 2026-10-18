@@ -1,0 +1,33 @@
+options
+========
+The options directive allows configuring Pipeline-specific options from within the Pipeline itself.
+
+What are the all different options can be used in options directive?
+
+1) retry 
+2) timeout
+3) quietPeriod
+4) timestamps
+5) buildDiscarder
+6) disableConcurrentBuilds
+==
+7) checkoutToSubdirectory
+8) disableResume
+==
+9) newContainerPerStage = docker integration
+==
+10) overrideIndexTriggers
+11) disableRestartFromStage
+12) preserveStashes
+==========
+13) skipDefaultCheckout
+14) skipStagesAfterUnstable
+15) parallelsAlwaysFailFast
+
+
+stage options
+==============
+1.skipDefaultCheckout
+2.timeout
+3.retry
+4)timestamps

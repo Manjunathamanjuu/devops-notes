@@ -1,0 +1,41 @@
+changelog ( commit message)
+==========
+Execute the stage if the build’s SCM changelog contains a given regular expression pattern, for example: 
+
+when { changelog '.*^\\[DEPENDENCY\\] .+$' }.
+
+https://github.com/bhanuprakash678910/when-changelog.git
+
+It builds if commit message has this regular expression.
+
+cat Jenkinsfile
+pipeline {
+    agent any
+    stages {
+        stage("Build") {
+            when {
+                changelog '.*some_text.*'
+            }
+            steps {
+                echo "Hello World changelog"
+            }
+        }
+    }
+}
+
+
+ git commit -m "test some_text message"
+
+Commit message: "test some_text message"
+ > git rev-list --no-walk 80321c4205b98b0f9b237d3ae43f17caf8e7fc72 # timeout=10
+[Pipeline] stage
+[Pipeline] { (Build)
+[Pipeline] echo
+Hello World changelog
+
+Try to do with different commit message " test"
+
+we we use different message,
+Stage "Build" skipped due to when conditional.
+
+

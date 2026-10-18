@@ -1,0 +1,43 @@
+Declarative Pipeline
+=====================
+1. Sections
+
+   a) agent
+   b) post
+   c) stages
+   d) steps
+
+2. Directives
+
+a) environment
+b) options
+c) parameters
+d) triggers
+      -Jenkins cron syntax
+e) stage
+f) tools
+g) input
+h) when
+
+
+
+3) Sequential Stages
+4) Parallel
+5) Matrix
+    axes
+    stages
+    excludes (optional)
+    Matrix cell-level directives (optional)
+
+
+6) Steps
+     - script
+
+ 
+
+Scripted Pipeline
+==================
+Flow Control
+Steps
+Differences from plain Groovy
+Syntax Comparison

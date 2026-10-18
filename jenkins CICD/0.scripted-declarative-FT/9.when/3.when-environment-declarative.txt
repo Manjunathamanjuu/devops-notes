@@ -1,0 +1,54 @@
+environment
+============
+Execute the stage when the specified environment variable is set to the given value, for example: 
+
+when { environment name: 'DEPLOY_TO', value: 'production' }.
+
+
+ex1
+===
+
+pipeline {
+    agent any
+	environment {
+		DEPLOY_TO='production'
+	}
+    stages {
+        stage('Deploy') {
+            when {
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+we defined environment variable DEPLOY_TO='production' and checking in when condition.It will match and hence
+stage will get executed.
+
+Now change value to dev in environment directive:
+=====================
+
+pipeline {
+    agent any
+	environment{
+		DEPLOY_TO='dev'
+	}
+    stages {
+        stage('Deploy') {
+            when {
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+job got successful, but Stage "Build" skipped due to when conditional
+

@@ -1,0 +1,124 @@
+overrideIndexTriggers
+======================
+Allows overriding default treatment of branch indexing triggers.
+
+If branch indexing triggers are disabled at the multibranch or organization label, 
+options { overrideIndexTriggers(true) } will enable them for this job only. 
+
+Otherwise, options { overrideIndexTriggers(false) } will disable branch indexing triggers for this job only.
+
+https://github.com/bhanuprakash678910/overridetriggers.git
+
+
+create multi branch pipeline with 1 minute index.
+
+node {
+
+	properties(
+		[
+			//overrideIndexTriggers(false)
+		]
+	) 
+
+    stage('Build') {	
+		echo 'Hello World 1'
+    }	
+}
+
+commit and change to Helloworld 2.
+
+node {
+
+	properties(
+		[
+			//overrideIndexTriggers(false)
+		]
+	) 
+
+    stage('Build') {	
+		echo 'Hello World 2'
+    }	
+}
+
+it will automatically detect the changes and print Hello world2.
+
+Now modify pipeline with options: overrideIndexTriggers(false) and commit.
+
+
+node {
+
+	properties(
+		[
+			overrideIndexTriggers(false)
+		]
+	) 
+
+    stage('Build') {	
+		echo 'Hello World 2'
+    }	
+}
+
+
+Now modify Hello World 2 to Hello World 3 and do one more commit.
+
+options { overrideIndexTriggers(false) } will disable branch indexing triggers for this job only.
+
+
+Changes detected: main (dc020c1185cb117fd0e05da7bc9de2a8976bebba → b942ee86ab6bc004602cd66c4b4fe4ce1f4862c4)
+Did not schedule build for branch: main
+
+Now, modify overrideIndexTriggers(false) to overrideIndexTriggers(true) and manually build the job.
+
+Now, modify Hello World 3  to Hello World 4 and do commit.
+
+overrideIndexTriggers(true) will enable triggers them for this job only.
+
+Changes detected: main (dc020c1185cb117fd0e05da7bc9de2a8976bebba → d4501c8255858e502c19775c3b93b8cfb6f80f93)
+Scheduled build for branch: main
+
+Hello World 4
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+
+ 
+
+pipeline {
+    agent any
+    options { overrideIndexTriggers(true) }
+   
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
+
+In Jenkins, overrideIndexTriggers is an option used in declarative pipelines to override the default behavior of indexing triggers.
+
+ By default, Jenkins will use the triggers defined in the pipeline script, but this option allows you to explicitly specify which triggers should be used for indexing.
+
+In this example, we have a declarative pipeline defined with the overrideIndexTriggers option set to true. This means that Jenkins will use the trigger defined in the triggers block  instead of the triggers defined in the pipeline script.
+
+
+pipeline {	
+    agent any	
+    options {	
+		timestamps()
+		overrideIndexTriggers(false)
+	        overrideIndexTriggers(env.BRANCH_NAME == 'dev')
+    }
+    stages {	
+        stage('Build') {	
+            steps {
+                echo 'Hello World 4-1'
+		echo env.BRANCH_NAME
+            }	
+        }	
+    }	
+}	

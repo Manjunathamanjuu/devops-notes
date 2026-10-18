@@ -1,0 +1,67 @@
+post section
+=============
+
+The post section defines one or more additional steps that are run upon the completion of a Pipeline’s or stage’s run (depending on the location of the post section within the Pipeline). post can support any of the following post-condition blocks: always, changed, fixed, regression, aborted, failure, success, unstable, unsuccessful, and cleanup. These condition blocks allow the execution of steps inside each condition depending on the completion status of the Pipeline or stage. 
+
+Required
+
+No
+
+Parameters
+
+None
+
+Allowed
+
+In the top-level pipeline block and each stage block.
+
+The condition blocks are executed in the order shown below.
+
+===
+1.always
+2.changed
+3.fixed
+4.regression
+5.aborted
+6.failure
+7.success
+8.unstable
+9.unsuccessful
+10.cleanup
+===
+
+	Conventionally, the post section should be placed at the end of the Pipeline.
+Post-condition blocks contain steps the same as the steps section.
+
+
+always
+Run the steps in the post section regardless of the completion status of the Pipeline’s or stage’s run.
+
+success
+Only run the steps in post if the current Pipeline’s or stage’s run has a "success" status, typically denoted by blue or green in the web UI.
+
+failure
+Only run the steps in post if the current Pipeline’s or stage’s run has a "failed" status, typically denoted by red in the web UI.
+
+
+aborted
+Only run the steps in post if the current Pipeline’s run has an "aborted" status, usually due to the Pipeline being manually aborted. This is typically denoted by gray in the web UI.
+
+unstable
+Only run the steps in post if the current Pipeline’s run has an "unstable" status, usually caused by test failures, code violations, etc. This is typically denoted by yellow in the web UI.
+
+cleanup
+Run the steps in this post condition after every other post condition has been evaluated, regardless of the Pipeline or stage’s status.
+
+changed
+Only run the steps in post if the current Pipeline’s run has a different completion status from its previous run.
+
+fixed
+Only run the steps in post if the current Pipeline’s run is successful and the previous run failed or was unstable.
+
+regression
+Only run the steps in post if the current Pipeline’s or status is failure, unstable, or aborted and the previous run was successful.
+
+unsuccessful
+Only run the steps in post if the current Pipeline’s or stage’s run has not a "success" status. This is typically denoted in the web UI depending on the status previously mentioned (for stages this may fire if the build itself is unstable).
+

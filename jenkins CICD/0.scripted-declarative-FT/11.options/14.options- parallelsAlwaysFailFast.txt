@@ -1,0 +1,196 @@
+parallelsAlwaysFailFast
+Set failfast true for all subsequent parallel stages in the pipeline. For example: options { parallelsAlwaysFailFast() }
+
+Here first we will understand: what is parallel stages ?
+
+Stages in Declarative Pipeline may have a parallel section containing a list of nested stages to be run in parallel.
+
+A stage must have one and only one of steps, stages, parallel, or matrix. It is not possible to nest a parallel or matrix block within a stage directive if that stage directive is nested within a parallel or matrix block itself. However, a stage directive within a parallel or matrix block can use all other functionality of a stage, including agent, tools, when, etc.
+
+pipeline {  
+    agent any
+    
+    stages {    
+        stage('one') {  
+            steps {
+                sh "echo Hello-1"
+            }  
+        }  
+        stage('two') {  
+            steps {
+                sh "echo Hello-2"
+            }  
+        }
+       stage('three') {  
+            steps {
+                sh "echo Hello-3"
+            }  
+        }    
+    }  
+}
+
+By default, above pipeline runs in sequential manner one after the other stage.
+
+lets implement parallel stages for stage2 and stage3.
+
+pipeline {  
+    agent any
+    
+    stages {    
+        stage('one') {  
+            steps {
+                sh "echo Hello-1"
+            }  
+        }  
+       stage("parallel stages 2 and 3"){
+         parallel {
+           stage('two') {  
+             steps {
+                sh "echo Hello-2"
+            }  
+         }
+           stage('three') {  
+             steps {
+                sh "echo Hello-3"
+             }  
+         }    
+       }  
+     }
+   }
+}
+==
+pipeline {  
+    agent any
+    
+    stages {    
+        stage('one') {  
+            steps {
+                sh "echo Hello-1"
+            }  
+        }  
+       stage("parallel stages 2 and 3"){
+         parallel {
+           stage('two') {  
+             steps {
+                sh "sleep 10"
+            }  
+         }
+           stage('three') {  
+             steps {
+                sh "sleep 15"
+             }  
+         }    
+       }  
+     }
+   }
+}
+
+Both stages executed parallelly.
+===
+
+parallelsAlwaysFailFast
+========================
+Set failfast true for all subsequent parallel stages in the pipeline. For example: options { parallelsAlwaysFailFast() }
+
+In addition, you can force your parallel stages to all be aborted when any one of them fails, by adding failFast true to the stage containing the parallel. Another option for adding failfast is adding an option to the pipeline definition: parallelsAlwaysFailFast().
+
+pipeline {  
+    agent any
+    
+    stages {    
+        stage('one') {  
+            steps {
+                sh "echo Hello-1"
+            }  
+        }  
+       stage("parallel stages 2 and 3"){
+         //failFast true
+         parallel {
+           stage('two') {  
+             steps {
+                sh "echoo hello-2"
+            }  
+         }
+           stage('three') {  
+             steps {
+                sh "echo hello-3"
+             }  
+         }    
+       }  
+     }
+   }
+}
+
+==
+failFast true -option
+======================
+
+pipeline {  
+    agent any
+    
+    stages {    
+        stage('one') {  
+            steps {
+                sh "echo Hello-1"
+            }  
+        }  
+       stage("parallel stages 2 and 3"){
+         failFast true
+         parallel {
+           stage('two') {  
+             steps {
+                sh "sleeeep 10"
+            }  
+         }
+           stage('three') {  
+             steps {
+                sh "sleep 60 && touch file55"
+             }  
+         }    
+       }  
+     }
+   }
+}
+
+when stage 2 failed, stage 3 also marked as failed.
+==
+
+parallelsAlwaysFailFast() = options
+=====================================
+when stage 2 failed, stage 3 also marked as failed.
+
+pipeline {  
+    agent any
+    options {
+        parallelsAlwaysFailFast()
+    }
+    
+    stages {    
+        stage('one') {  
+            steps {
+                sh "echo Hello-1"
+            }  
+        }  
+       stage("parallel stages 2 and 3"){
+         parallel {
+           stage('two') {  
+             steps {
+                sh "sleeeep 10"
+            }  
+         }
+           stage('three') {  
+             steps {
+                sh "sleep 60 && touch file55"
+             }  
+         }    
+       }  
+     }
+   }
+}
+
+
+
+
+
+
+

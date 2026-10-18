@@ -1,0 +1,102 @@
+disableConcurrentBuilds
+Disallow concurrent executions of the Pipeline. 
+
+Can be useful for preventing simultaneous accesses to shared resources, etc. 
+
+For example: options { disableConcurrentBuilds() } to queue a build when there’s already an executing build of the Pipeline, or options { disableConcurrentBuilds(abortPrevious: true) } to abort the running one and start the new build.
+====
+
+node() {
+ stage("build") {
+  sh '''sleep 10 
+        echo hello '''
+ } 
+}
+
+click on build now,  when this is running, click again build now. it will run parallely.
+
+
+node() {
+ properties([disableConcurrentBuilds()])
+ stage("build") {
+  sh '''sleep 10 
+        echo hello '''
+ } 
+}
+
+click on build now,  when this is running, click again build now. another job will be pending until previous job is completed.
+===
+
+node() {
+ properties([disableConcurrentBuilds(abortPrevious: true)])
+ stage("build") {
+  sh '''sleep 10 
+        echo hello '''
+ } 
+}
+
+click on build now,  when this is running, click again build now. previosu job is not built and another job will be running.
+
+
+Sending interrupt signal to process
+Superseded by #22
+Terminated
+script returned exit code 143
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 8da468ff-d386-4a5d-a91e-34f82e189645
+Finished: NOT_BUILT
+==
+
+node{
+	properties(
+		[
+			disableConcurrentBuilds()
+		]
+	)
+	
+	stage('Build'){
+		sleep(time: 10, unit: 'SECONDS') 	
+                echo 'Hello World'	
+	}
+}
+==
+
+
+==
+
+pipeline {
+  agent any
+  options { 
+    disableConcurrentBuilds() 
+   } 
+  stages {
+    stage("build") {
+       steps {
+         sh 'sleep 10 && echo hello'
+      }
+   }
+  }
+}
+
+pipeline {
+  agent any
+  options { 
+    disableConcurrentBuilds(abortPrevious: true) 
+   } 
+  stages {
+    stage("build") {
+       steps {
+         sh 'echo hello'
+      }
+   }
+  }
+}
+
+click on build now,  when this is running, click again build now. previosu job is aborted and another job will be running.
+===
+
+

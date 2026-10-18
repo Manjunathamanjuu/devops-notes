@@ -1,0 +1,47 @@
+quietPeriod
+Set the quiet period, in seconds, for the Pipeline, overriding the global default. 
+
+In Jenkins, the "quiet period" refers to a delay between the time a build is triggered and when it actually starts executing. This can be useful in scenarios where multiple builds are triggered in rapid succession, as it allows Jenkins to batch them together, potentially reducing the load on the system.
+
+During the quiet period, Jenkins will wait for a specified amount of time before starting the build. If another build is triggered for the same job during this period, Jenkins will reset the timer and wait for the new quiet period to elapse.
+
+
+Keep in mind that the quiet period is a global setting for a job, meaning that it applies to all builds of that job. If you need different quiet periods for different builds, you may need to create separate jobs with their own configurations.
+
+Remember, the quiet period is not enforced for manual builds triggered by users. It only applies to builds triggered by events such as SCM changes or other build triggers.
+
+For example: options { quietPeriod(30) }
+
+Freestyle
+
+pollSCM */2 * * * *
+
+In Advanced:  quietperiod =30
+
+chnage in github. and see the quiet period for job execution.
+
+
+declarative- quiteperiod
+============
+
+pipeline {
+  agent any
+  triggers {
+  pollSCM '*/2 * * * *'
+  }
+  options {
+    quietPeriod 30
+  }
+  stages {
+    stage("init") {
+       steps {
+         git 'https://github.com/bhanuprakash678910/mavenproj.git'
+      }
+   }
+  }
+}
+
+scripted pipeline
+=================
+no such option
+==

@@ -1,0 +1,565 @@
+scripted pipeline
+==================
+
+a) node without any stage
+============================
+
+node {
+  echo "Hello world"
+}
+
+b) node with stage
+============================
+
+node {
+  stage("init") {
+    echo "Hello world"
+   } 
+}
+
+c) node inside node
+===================
+
+node {
+  stage("init") {
+     node {
+        echo "Hello world"
+     }
+   } 
+}
+==
+
+node {
+  stage("init") {
+     node("ubuntu-slave") {
+        sh 'free -mh'
+     }
+   } 
+  stage("linux") {
+     node {
+        sh 'df -h'
+     }
+   } 
+
+}
+
+
+stages without node block => Is it possible?  Answer: Yes
+===========================
+
+  stage("init") {
+     node("ubuntu-slave") {
+        sh 'free -mh'
+     }
+   } 
+  stage("maven") {
+     node {
+        sh 'df -h'
+     }
+   } 
+
+==
+
+without node block inside stage:
+========================================
+
+  stage("init") {
+        sh 'free -m'
+     }
+  stage("maven") { 
+      sh 'df -h'  
+   } 
+
+we got error message: 
+
+Also:   org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: 29c8064e-237e-464e-87d7-20b6b8bd9fb6
+org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
+Perhaps you forgot to surround the code with a step that provides this, such as: node
+
+===
+
+Declarative Pipeline
+=====================
+
+agent
+======
+1. any
+2. none
+3. label
+4. node
+5. docker
+6. dockerfile
+7.kubernetes
+
+agent any usage
+================
+pipeline {
+  agent any 
+  stages {
+    stage("init") {
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+===
+
+top level agents and stage level agents
+=======================================
+
+agent none usage
+================
+
+pipeline {
+  agent none
+  stages {
+    stage("init") {
+     agent any
+       steps {
+         echo "Hello world"
+      }
+   }
+    stage("init2") {
+     agent any
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+
+==
+
+Is it possible to run different stages on different machines?  yes, we can agent none and you need agent at stage level.
+
+pipeline {
+  agent none
+  stages {
+    stage("init") {
+     agent any
+       steps {
+         echo "Hello world"
+      }
+   }
+    stage("init2") {
+     agent {
+      label 'ubuntu-slave'
+     }
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+
+==
+
+remove agent at one stage => Jenkins master itself.
+==========================
+
+pipeline {
+  agent none
+  stages {
+    stage("init") {
+     agent any
+       steps {
+         echo "Hello world"
+      }
+   }
+    stage("init2") {
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+
+==
+
+agent none- but we have not define any stage level agent => not recommended
+=============================================================================
+
+pipeline {
+  agent none
+  stages {
+    stage("init") {
+       steps {
+         echo "Hello world"
+      }
+   }
+    stage("init2") {
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+
+
+All these stages Run in master node, because you mentioned agent none and you missed to keep agent at stage level.
+
+==
+
+All stages on slave node instead of Jenkins master ==> usage of agent with label
+=================================================================================
+pipeline {
+  agent {
+    label 'ubuntu-slave'
+  } 
+  stages {
+    stage("init") {
+       steps {
+         echo "Hello world"
+      }
+   }
+     stage("init2") {
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+==
+
+i want to run one stage on slave1 and another stage on Jenkins master
+======================================================================
+
+pipeline {
+  agent none
+  stages {
+    stage("init") {
+       agent {
+      label 'ubuntu-slave'
+      }
+       steps {
+         echo "Hello world"
+      }
+   }
+     stage("init2") {
+       agent any
+       steps {
+         echo "Hello world"
+      }
+   }
+  }
+}
+
+
+workspaces in pipeline scripts on  jenkins
+============================================
+pipeline {
+  agent any
+  stages {
+    stage("init") {
+       steps {
+         sh 'touch f1'
+      }
+   }
+     stage("init2") {
+       steps {
+         sh 'touch f2'
+      }
+   }
+  }
+}
+
+click on build number,  on left side, you can see workspaces.
+
+
+
+==
+workspaces in pipeline scripts on  slave1
+============================================
+
+pipeline {
+  agent {
+   label 'ubuntu-slave'
+  }
+  stages {
+    stage("init") {
+       steps {
+         sh 'touch f1'
+      }
+   }
+     stage("init2") {
+       steps {
+         sh 'touch f2'
+      }
+   }
+  }
+}
+
+/home/ubuntu/jenkinsdir/workspace/scriptedjob 
+
+== 
+custom workspace - agent - node
+=================
+
+pipeline {
+  agent {
+   node {
+     label 'master'
+     customWorkspace '/var/lib/jenkins/testdir'
+    }
+  }
+  stages {
+    stage("init") {
+       steps {
+         sh 'touch f1'
+      }
+   }
+     stage("init2") {
+       steps {
+         sh 'touch f2'
+      }
+   }
+  }
+}
+
+
+
+=====
+custom workspace on slave1 - node with label
+=============================================
+pipeline {
+  agent {
+   node {
+     label 'ubuntu-slave'
+     customWorkspace '/home/ec2-user/testdir'
+    }
+  }
+  stages {
+    stage("init") {
+       steps {
+         sh 'touch f1'
+      }
+   }
+     stage("init2") {
+       steps {
+         sh 'touch f2'
+      }
+   }
+  }
+}
+
+it will create testdir automatically.
+
+custom workspace on slave1 - node with label => reading the file from custom workspace
+=======================================================================================
+
+pipeline {
+  agent none
+  stages {
+    stage("read") {
+      agent { 
+        node {
+           label 'slave-redhat'
+           customWorkspace '/var/lib/jenkins/testdir'
+       }
+      }
+       steps {
+         sh 'cat sample.txt'
+      }
+   }
+  }
+}
+
+
+dir():
+======
+
+pipeline {
+  agent {
+   node {
+     label 'master'
+     customWorkspace '/var/lib/jenkins/testdir'
+    }
+  }
+  stages {
+    stage("init") {
+       steps {
+         sh 'touch f111'
+      }
+   }
+     stage("init2") {
+       steps {
+         sh 'touch f222'
+      }
+   }
+     stage("dir") {
+       steps {
+         dir("/var/lib/jenkins/dir345") {
+           sh '''cat file1 && touch file333'''
+         }
+      }
+   }
+  }
+}
+
+Jenkinsfile-> you will script
+==============================
+
+dir("/jenkins") {
+//execute jenkinsfile
+}
+
+dir("/docker/test") {
+docker build -t demo .
+
+}
+==
+
+agent with docker
+==================
+docker
+Execute the Pipeline, or stage, with the given container which will be dynamically provisioned on a node pre-configured to accept Docker-based Pipelines, or on a node matching the optionally defined label parameter. docker also optionally accepts an args parameter which may contain arguments to pass directly to a docker run invocation, and an alwaysPull option, which will force a docker pull even if the image name is already present. For example: agent { docker 'maven:3.9.3-eclipse-temurin-17' } or
+
+agent {
+    docker {
+        image 'maven:3.9.3-eclipse-temurin-17'
+        label 'my-defined-label'
+        args  '-v /tmp:/tmp'
+    }
+}
+docker also optionally accepts a registryUrl and registryCredentialsId parameters which will help to specify the Docker Registry to use and its credentials. The parameter registryCredentialsId could be used alone for private repositories within the docker hub. For example:
+
+agent {
+    docker {
+        image 'myregistry.com/node'
+        label 'my-defined-label'
+        registryUrl 'https://myregistry.com/'
+        registryCredentialsId 'myPredefinedCredentialsInJenkins'
+    }
+}
+
+
+==
+Example 1. Docker Agent, Declarative Pipeline
+pipeline {
+    agent { docker 'maven:3.9.3-eclipse-temurin-17' } 
+    stages {
+        stage('Example Build') {
+            steps {
+                sh 'mvn -B clean verify'
+            }
+        }
+    }
+}
+GROOVY
+
+Copied!
+Execute all the steps defined in this Pipeline within a newly created container of the given name and tag (maven:3.9.3-eclipse-temurin-17).
+
+==
+Example 2. Stage-level Agent Section
+pipeline {
+    agent none 
+    stages {
+        stage('Example Build') {
+            agent { docker 'maven:3.9.3-eclipse-temurin-17' } 
+            steps {
+                echo 'Hello, Maven'
+                sh 'mvn --version'
+            }
+        }
+        stage('Example Test') {
+            agent { docker 'openjdk:17-jre' } 
+            steps {
+                echo 'Hello, JDK'
+                sh 'java -version'
+            }
+        }
+    }
+}
+Defining agent none at the top-level of the Pipeline ensures that an Executor will not be assigned unnecessarily. Using agent none also forces each stage section to contain its own agent section.
+Execute the steps in this stage in a newly created container using this image.
+Execute the steps in this stage in a newly created container using a different image from the previous stage.
+==
+
+==
+
+agent with dockerfile
+=====================
+dockerfile
+Execute the Pipeline, or stage, with a container built from a Dockerfile contained in the source repository. In order to use this option, the Jenkinsfile must be loaded from either a Multibranch Pipeline or a Pipeline from SCM. Conventionally this is the Dockerfile in the root of the source repository: agent { dockerfile true }. If building a Dockerfile in another directory, use the dir option: agent { dockerfile { dir 'someSubDir' } }. If your Dockerfile has another name, you can specify the file name with the filename option. You can pass additional arguments to the docker build …​ command with the additionalBuildArgs option, like agent { dockerfile { additionalBuildArgs '--build-arg foo=bar' } }. For example, a repository with the file build/Dockerfile.build, expecting a build argument version:
+
+agent {
+    // Equivalent to "docker build -f Dockerfile.build --build-arg version=1.0.2 ./build/
+    dockerfile {
+        filename 'Dockerfile.build'
+        dir 'build'
+        label 'my-defined-label'
+        additionalBuildArgs  '--build-arg version=1.0.2'
+        args '-v /tmp:/tmp'
+    }
+}
+dockerfile also optionally accepts a registryUrl and registryCredentialsId parameters which will help to specify the Docker Registry to use and its credentials. For example:
+
+agent {
+    dockerfile {
+        filename 'Dockerfile.build'
+        dir 'build'
+        label 'my-defined-label'
+        registryUrl 'https://myregistry.com/'
+        registryCredentialsId 'myPredefinedCredentialsInJenkins'
+    }
+}
+
+===
+
+kubernetes-agent
+=================
+kubernetes
+Execute the Pipeline, or stage, inside a pod deployed on a Kubernetes cluster. In order to use this option, the Jenkinsfile must be loaded from either a Multibranch Pipeline or a Pipeline from SCM. The Pod template is defined inside the kubernetes { } block. For example, if you want a pod with a Kaniko container inside it, you would define it as follows:
+
+agent {
+    kubernetes {
+        defaultContainer 'kaniko'
+        yaml '''
+kind: Pod
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - sleep
+    args:
+    - 99d
+    volumeMounts:
+      - name: aws-secret
+        mountPath: /root/.aws/
+      - name: docker-registry-config
+        mountPath: /kaniko/.docker
+  volumes:
+    - name: aws-secret
+      secret:
+        secretName: aws-secret
+    - name: docker-registry-config
+      configMap:
+        name: docker-registry-config
+'''
+   }
+You will need to create a secret aws-secret for Kaniko to be able to authenticate with ECR. This secret should contain the contents of ~/.aws/credentials. The other volume is a ConfigMap which should contain the endpoint of your ECR registry. For example:
+
+{
+      "credHelpers": {
+        "<your-aws-account-id>.dkr.ecr.eu-central-1.amazonaws.com": "ecr-login"
+      }
+}
+
+===
+
+
+
+
+
+
+
+
+
+
+
+
+

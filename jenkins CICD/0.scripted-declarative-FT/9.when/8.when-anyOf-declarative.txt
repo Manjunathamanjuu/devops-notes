@@ -1,0 +1,85 @@
+anyOf
+======
+Execute the stage when at least one of the nested conditions is true. Must contain at least one condition. For example: 
+
+when { anyOf { branch 'master'; branch 'dev' } }
+
+when -anyOf
+=============
+
+pipeline {
+    agent any
+	environment{
+		version="2.0"
+		some_name="sai"
+	}
+    stages {
+        stage("Build") {
+            when {
+                anyOf { 
+					environment name: "version", value: "1.0"
+					environment name: "some_name", value: "sai"
+				}
+            }
+            steps {
+                echo "Building anyOf ${version} ${some_name}"
+            }
+        }
+    }
+}
+==
+
+==
+
+Example 18. Multiple condition and nested condition
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                branch 'master'
+                anyOf {
+                    environment name: 'DEPLOY_TO', value: 'production'
+                    environment name: 'DEPLOY_TO', value: 'staging'
+                }
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+===
+
+Example . Expression condition and nested condition
+pipeline {
+    agent any
+    environment {
+       DEPLOY_TO="production"
+     }
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                expression { BRANCH_NAME ==~ /(master|dev)/ }
+                anyOf {
+                    environment name: 'DEPLOY_TO', value: 'production'
+                    environment name: 'DEPLOY_TO', value: 'staging'
+                }
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}

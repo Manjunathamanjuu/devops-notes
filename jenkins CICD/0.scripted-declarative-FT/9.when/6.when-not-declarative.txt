@@ -1,0 +1,94 @@
+when-not
+====
+Execute the stage when the nested condition is false. Must contain one condition. For example: 
+
+when { not { branch 'master' } }
+
+==
+
+pipeline {
+    agent any
+    stages {
+        stage('git code') {
+            when {
+                not {
+                 branch 'dev'
+               }
+            }
+            steps {
+               git branch: 'master', url: 'https://github.com/bhanuprakash678910/mavenproj.git'
+            }
+        }
+    }
+}
+
+build will pull the code.
+
+Now change branch to master.
+
+pipeline {
+    agent any
+    stages {
+        stage('git code') {
+            when {
+                not {
+                 branch 'master'
+               }
+            }
+            steps {
+               git branch: 'master', url: 'https://github.com/bhanuprakash678910/mavenproj.git'
+            }
+        }
+    }
+}
+
+o/p:
+----
+Stage "git code" skipped due to when conditional
+
+
+
+when - not can be run in pipeline job.
+===========
+
+pipeline {
+    agent any
+	environment{
+		some_name="sai"
+	}	
+    stages {
+        stage('Build') {
+            when {
+				not{
+					equals expected: "john", actual: some_name
+				}
+            }
+            steps {
+				echo "${some_name}"
+            }
+        }
+    }
+}
+
+
+try some_name=john and test the pipeline
+
+pipeline {
+    agent any
+	environment{
+		some_name="john"
+	}	
+    stages {
+        stage('Build') {
+            when {
+				not {
+					equals expected: "john", actual: some_name
+				}
+            }
+            steps {
+				echo "${some_name}"
+            }
+        }
+    }
+}
+===

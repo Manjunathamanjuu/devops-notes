@@ -1,0 +1,86 @@
+2) timeouts:
+
+=============
+timeout
+Set a timeout period for this stage, after which Jenkins should abort the stage. For example: options { timeout(time: 1, unit: 'HOURS') }
+
+declarative -- timeout
+======================
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            options {
+                timeout(time: 1, unit: 'MINUTES')  // DAYS,HOURS,MINUTES,SECONDS,MILLISECONDS,MICROSECONDS,NANOSECONDS
+            }
+            steps {
+                sh 'sleep 120'
+            }
+        }
+    }
+}
+
+==
+
+scripted -- timeout
+======================
+
+node {
+ stage("build") {
+      timeout(time: 1, unit: 'MINUTES') {
+          sleep 2
+      }
+}
+
+==
+
+scripted-timeout-2
+===================
+
+timeout(time: 1, unit: 'MINUTES') {
+        node {
+          sleep 120
+         }
+   }
+==
+scripted-timeout-3
+===================
+
+node {
+   timeout(time: 1, unit: 'MINUTES') {
+ stage("build") {
+       
+        sleep 2
+      }
+   }
+}
+
+====
+
+declarative-retry-timeout
+=========================
+
+retry->timeout
+--------------
+
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                retry(3) {
+				    timeout(time: 1, unit: 'SECONDS') {
+							sleep 2
+					}
+                    echo "after timeout"
+                }
+            }
+        }
+    }
+}
+
+Error message:
+=============
+Timeout has been exceeded
+org.jenkinsci.plugins.workflow.actions.ErrorAction$ErrorId: df4190f5-7684-4451-aae9-4e85d025b0a5
+Finished: ABORTED

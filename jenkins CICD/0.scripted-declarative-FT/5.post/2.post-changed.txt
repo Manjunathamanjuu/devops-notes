@@ -1,0 +1,49 @@
+changed 
+-------------
+Only run the steps in post if the current Pipeline’s run has a different completion status from its previous run.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"					
+					//script{
+					//	currentBuild.result = 'UNSTABLE'
+					//}
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run has a different completion status from its previous run.
+        changed { 
+            echo 'post->changed is called'
+        }
+    }
+}
+
+
+comment script block to change status to UNSTABLE.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"					
+					script{
+						currentBuild.result = 'UNSTABLE'
+					}
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run has a different completion status from its previous run.
+        changed { 
+            echo 'post->changed is called'
+        }
+    }
+}
+
+
+Now post block executed.

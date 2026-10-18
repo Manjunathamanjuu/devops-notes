@@ -1,0 +1,63 @@
+changeset
+==========
+Execute the stage if the build’s SCM changeset contains one or more files matching the given pattern. Example: 
+
+when { changeset "**/*.js" }
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: * EQUALS for a simple string comparison * GLOB (the default) for an ANT style path glob case insensitive (this can be turned off with the caseSensitive parameter). * REGEXP for regular expression matching
+
++ For example: 
+
+when { changeset pattern: ".TEST\\.java", comparator: "REGEXP" } or when { changeset pattern: "*/*TEST.java", caseSensitive: true }
+
+https://github.com/bhanuprakash678910/when-changeset.git
+
+create multibranch pipeline and build the master
+
+
+pipeline {
+    agent any
+    stages {
+        stage("Build") {
+            steps {
+                echo "Hello World changeset"
+            }
+        }
+    }
+}
+
+lets build the jenkinsfile using changeset.
+
+pipeline {
+    agent any
+    stages {
+        stage("Build") {
+           when {
+                changeset "**/*.java"
+            }
+           steps {
+                echo "Hello World changeset"
+              }
+        }
+    }
+}
+
+whenever we modify the sample.java , build will trigger the master.
+
+post
+=====
+Commit message: "Update sample.java"
+ > git rev-list --no-walk 4f976748aba3f4ad914c70a0fec9bd32b961541a # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Build) (hide)
+[Pipeline] echo
+Hello World changeset
+
+
+
+
+

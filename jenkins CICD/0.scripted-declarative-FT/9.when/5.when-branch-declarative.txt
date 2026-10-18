@@ -1,0 +1,160 @@
+branch
+======
+Execute the stage when the branch being built matches the branch pattern (ANT style path glob) given, for example: 
+
+when { branch 'master' }
+
+. Note that this only works on a multibranch Pipeline.
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: * EQUALS for a simple string comparison * GLOB (the default) for an ANT style path glob (same as for example changeset) * REGEXP for regular expression matching
+
++ For example: 
+
+when { branch pattern: "release-\\d+", comparator: "REGEXP"}
+
+when- branch
+============
+
+Create repo in github: https://github.com/bhanuprakash678910/when-stage-branch.git
+
+and it is have branches main and dev.
+
+Jenkinsfile
+============
+
+pipeline {
+    agent any
+    stages {
+        stage("Build Main") {
+            when {
+              branch 'main'
+            }
+            steps {
+                echo "Building Main"
+            }
+        }
+       stage("Build Dev") {
+            when {
+              branch 'dev'
+            }
+            steps {
+                echo "Building Dev"
+            }
+        }
+  }
+}
+
+
+create dev branch and create new multi branch pipeline job.
+
+git as source:  https://github.com/bhanuprakash678910/when-stage-branch.git
+
+observe the output of the branches.
+
+Building Main
+Stage "Building Dev" skipped due to when conditional
+
+
+Stage "Building Main" skipped due to when conditional
+Building Dev
+
+
+ex
+===
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                branch 'dev'
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+o/p:
+==
+
+Hello World
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Example Deploy)
+Stage "Example Deploy" skipped due to when conditional
+==
+Run this example on multibranch pipeline
+==========================================
+
+create multibranch and 
+pipeline {
+    agent any
+    stages {
+        stage('git code') {
+            when {
+                branch 'dev'
+            }
+            steps {
+               git branch: 'master', url: 'https://github.com/bhanuprakash678910/mavenproj.git'
+            }
+        }
+    }
+}
+
+when { branch 'master' }
+
+. Note that this only works on a multibranch Pipeline.
+
+
+==
+Example . Multiple Condition, Declarative Pipeline
+
+pipeline {
+    agent any
+    stages {
+        stage('git code') {
+            when {
+                branch 'dev'
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+            steps {
+               git branch: 'master', url: 'https://github.com/bhanuprakash678910/mavenproj.git'
+            }
+        }
+    }
+}
+
+o/p:- Stage "git code" skipped due to when conditional
+
+add environtment variable and do changes in dev branch
+=======================================================
+pipeline {
+    agent any
+    environment {
+      DEPLOY_TO ='production'
+    }
+    stages {
+        stage('git code') {
+            when {
+                branch 'dev'
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+            steps {
+               git branch: 'master', url: 'https://github.com/bhanuprakash678910/mavenproj.git'
+            }
+        }
+    }
+}
+
+git code stage executed successfully
+
+
+
+===

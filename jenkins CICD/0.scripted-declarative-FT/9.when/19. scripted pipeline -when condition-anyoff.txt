@@ -1,0 +1,34 @@
+node when
+==========
+node{
+	def name="sai"
+	def isGroovyCool = false
+    withEnv(['DEPLOY_TO=production']) {
+        stage('Build') {
+		
+			//when-environment condition
+			if(env.DEPLOY_TO == 'production')
+				println "Deploying"
+				
+			//when-equals condition
+			if(	name == "sai")
+				println "name is ${name}"
+
+			//when-expression condition				
+			if(isGroovyCool == false)
+				println "groovy is always cool"
+				
+			//when-not condition
+			if(	name != "john")
+				println "name is not john"			
+			
+			//when-allOf condition			
+			if( name == "sai" && !isGroovyCool)
+				println "name is ${name} and groovy is cool"
+				
+			//when-anyOf condition	
+			if( name == "sai" || !isGroovyCool)
+				println "name is ${name} or groovy is cool"	
+        }
+    }
+}

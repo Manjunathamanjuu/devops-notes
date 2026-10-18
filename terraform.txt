@@ -1,0 +1,85 @@
+what is forch-each ?
+for_each meta-argument is used to create multiple resources from a map or a set of strings without writing the same resource block repeatedly.
+
+Why do we use for_each?
+Suppose you want to create three AWS EC2 instances: dev, test, and prod.
+Without for_each, you would write three separate resource blocks. With for_each, you can create all three using a single resource block.
+
+Difference between count and for_each
+Feature 	         count	                    for_each
+Input	                 Number	                    Map or set of strings
+Resource identity        Numeric index	            Named key
+Example    	         demo[0]	                    demo["dev"]
+Best use	          Identical resources	     Resources with meaningful names or configurations
+Risk when removing an item	Index shifts can cause replacement	Other keys generally remain stable
+
+. When should you use for_each?
+Use for_each when you want to:
+- Create multiple EC2 instances with different names.
+- Create several IAM users or security groups.
+- Create resources from a map of environment-specific settings.
+- Manage resources by stable, meaningful keys.
+Interview answer: 
+for_each is a Terraform meta-argument that creates multiple instances of a resource or module from a map or set of strings. Each instance is identified by a key, making resource management more predictable than using numeric indexes with count.
+
+
+aws --version
+aws configure
+aws sts get-caller-identity
+
+terraform init
+terraform validate
+terraform plan
+terraform apply
+terraform destory
+
+What is terraform.tfstate?
+The terraform.tfstate file is a file that Terraform uses to store information about the infrastructure it manages.
+When you run terraform apply to create an AWS EC2 instance, Terraform records details about that instance in terraform.tfstate.
+Think of it as Terraform's record book for the resources it manages.
+1. How does it work?
+Your Terraform code
+ec2.tf
+
+terraform apply
+Creates or updates AWS resources
+
+terraform.tfstate
+Records resource identities and attributes
+
+2. Why do we need the state file?
+- Track resources: Terraform remembers which AWS resources it manages.
+- Compare changes: Terraform compares your configuration with the recorded state and current infrastructure to determine what changes are needed.
+- Update resources: Terraform can identify existing resources instead of treating every apply as a brand-new deployment.
+- Destroy resources: Terraform uses the state to identify resources it manages when you run terraform destroy
+
+3. Useful commands
+Command	Purpose
+terraform apply	Creates or updates infrastructure and records the resulting state.
+terraform state list	Lists resources tracked in the state.
+terraform show	Displays the current state or saved plan.
+terraform state show aws_instance.demo["ami-..."]	Shows details of a specific resource, using its actual Terraform address.
+terraform state pull	Retrieves the current state from the configured backend.
+
+What happens if we delete terraform.tfstate?
+Answer: Terraform loses its recorded mapping between the configuration and the resources it manages. The actual AWS resources are not automatically deleted, but Terraform may propose creating duplicates or may no longer manage those resources correctly. Recovery should be done carefully, for example by restoring the state backup or importing existing resources.
+Remember: Terraform code describes the desired infrastructure; the state file records Terraform's knowledge of the infrastructure it manages.
+
+
+
+what is depends-on?
+
+In Terraform, depends_on is a meta-argument used to define an explicit dependency between resources. 
+It tells Terraform which resource must be created or updated before another resource.
+
+1. Why do we use depends_on?
+Terraform automatically identifies dependencies when one resource references another resource's attributes. However, sometimes Terraform cannot identify a dependency automatically. In that case, we use depends_on.
+Example: You want to create an EC2 instance only after an IAM policy has been attached to a role.
+
+4. Difference between implicit dependency and depends_on
+Implicit dependency	                                     Explicit dependency
+Terraform detects it automatically.	                     You define it manually.
+Created through resource references.	                     Created using depends_on.
+Example: using a security group's ID in an EC2 instance.	Example: waiting for a policy attachment before creating another resource.
+
+

@@ -1,0 +1,150 @@
+1) retry
+On failure, retry the entire Pipeline the specified number of times. For example: options { retry(3) }
+
+On failure, retry this stage the specified number of times. For example: 
+
+options { retry(3) } => this is for declarative syntax
+retry(3) =>  this is for scripted syntax..
+
+scripted pipeline-retry-1
+==========================
+
+node{
+   stage("init") {
+        retry(3) {
+           ecoh "hi"
+         }
+    }
+ }
+
+
+scripted pipeline-retry-2
+=========================
+
+node{
+   retry(3){
+     stage("init") {
+           ecoh "hi"
+         }
+     }
+ }
+
+scripted pipeline-retry-3
+==========================
+
+node{
+   retry(3){
+     stage("init") {
+           echo "hi"
+         }
+     stage("init2") {
+           ecoh "hi"
+         }
+     }
+ }
+
+scripted pipeline-retry-4
+==========================
+
+node{
+   retry(3){
+     stage("init") {
+           echo "hi"
+         }
+     stage("init2") {
+           ecoh "hi"
+         }
+     }
+ }
+
+scripted pipeline-retry-5
+===========================
+
+node{
+   retry(3){
+     stage("init") {
+           echo "hi"
+         }
+     stage("init2") {
+           echo "hi"
+         }
+     }
+    retry(2){
+     stage("init3") {
+           ecoh "hi"
+         }
+     } 
+ }
+
+scripted pipeline-retry-6
+=========================
+
+retry(3){ 
+   node("slave1") {
+      echo "hi" 
+   }
+   stage("init") {
+           echo "hi"
+         }
+     stage("init2") {
+           echo "hi"
+         }
+}
+
+scripted pipeline-retry-7
+==========================
+
+retry(3){ 
+   node("slave1") {
+      echo "hi" 
+   }
+   stage("init") {
+           ecoh "hi"
+         }
+     stage("init2") {
+           echo "hi"
+         }
+}
+
+declarative pipeline-retry-1
+=============================
+
+pipeline {
+  agent any
+  stages {
+    stage("init") {
+          options {
+             retry(3)
+           }
+       steps {
+         echo "Hello world"
+         error "error here"
+         echo  "after error"
+      }
+   }
+  }
+}
+
+declarative pipeline-retry-2
+=============================
+
+pipeline {
+  agent any
+  options {
+             retry(3)
+           }
+  stages {
+    stage("init") { 
+       steps {
+         echo "Hello world"
+         error "error here"
+         echo  "after error"
+      }
+   }
+  }
+}
+
+
+
+
+

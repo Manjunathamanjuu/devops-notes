@@ -1,0 +1,165 @@
+expression
+==========
+Execute the stage when the specified Groovy expression evaluates to true, for example:
+
+ when { expression { return params.DEBUG_BUILD } }.
+
+When returning strings from your expressions they must be converted to booleans or return null to evaluate to false. Simply returning "0" or "false" will still evaluate to "true".
+
+when - expression
+=================
+
+pipeline {
+    agent any
+	environment{
+		version="1.0"
+	}
+    stages {
+        stage("Build") {
+            when {
+                expression { 
+					version == "1.0" 
+				}
+            }
+            steps {
+                echo "Building ${version}"
+            }
+        }
+    }
+}
+
+
+==
+
+change version="2.0" in env
+
+pipeline {
+    agent any
+	environment{
+		version="2.0"
+	}
+    stages {
+        stage("Build") {
+            when {
+                expression { 
+					version == "1.0" 
+				}
+            }
+            steps {
+                echo "Building ${version}"
+            }
+        }
+    }
+}
+
+Stage "Build" skipped due to when conditional
+=====
+
+create multibranch pipeline with the below code:  https://github.com/bhanuprakash678910/when-expression.git
+=================================================
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+
+        stage('Test') {
+            when {
+                expression {
+                    // Define your condition here
+                    return params.BRANCH_NAME == 'main'
+                }
+            }
+            steps {
+                echo 'Testing...'
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                expression {
+                    // Another condition
+                    return params.BRANCH_NAME == 'main' && currentBuild.resultIsBetterOrEqualTo('SUCCESS')
+                }
+            }
+            steps {
+                echo 'Deploying...'
+            }
+        }
+    }
+}
+
+Stage "Test" skipped due to when conditional
+Stage "Deploy" skipped due to when conditional
+
+Now create a branch called "main".
+
+and test the pipeline.
+
+master will still failed the build with Stage "Test" & Stage "Deploy" skipped due to when conditional.
+
+verify the main build it will failed the build with Stage "Test" & Stage "Deploy" skipped due to when conditional.
+
+In this example:
+
+The "Build" stage will always be executed.
+The "Test" stage will only be executed if the condition specified in the when block evaluates to true. In this case, it checks if the branch name is 'main'.
+The "Deploy" stage will only be executed if the conditions specified in its when block evaluate to true. It checks both the branch name and whether the previous stages were successful.
+
+You can customize the conditions inside the expression block based on your requirements. 
+
+The available context variables include params, env, and others, depending on your pipeline configuration.
+
+so change params to env in the code and hence builds are successful by satisyfing the conditions.
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+
+        stage('Test') {
+            when {
+                expression {
+                    // Define your condition here
+                    return env.BRANCH_NAME == 'main'
+                }
+            }
+            steps {
+                echo 'Testing...'
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                expression {
+                    // Another condition
+                    return env.BRANCH_NAME == 'main' && currentBuild.resultIsBetterOrEqualTo('SUCCESS')
+                }
+            }
+            steps {
+                echo 'Deploying...'
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+ 
+
+
+

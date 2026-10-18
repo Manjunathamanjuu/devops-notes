@@ -1,0 +1,151 @@
+environment
+============
+The environment directive specifies a sequence of key-value pairs which will be defined as environment variables for all steps, or stage-specific steps, depending on where the environment directive is located within the Pipeline.
+
+This directive supports a special helper method credentials() which can be used to access pre-defined Credentials by their identifier in the Jenkins environment.
+
+Required
+
+No
+
+Parameters
+
+None
+
+Allowed
+
+Inside the pipeline block, or within stage directives.
+
+Supported Credentials Type
+==========================
+
+Secret Text
+The environment variable specified will be set to the Secret Text content.
+
+Secret File
+The environment variable specified will be set to the location of the File file that is temporarily created.
+
+Username and password
+The environment variable specified will be set to username:password and two additional environment variables will be automatically defined: MYVARNAME_USR and MYVARNAME_PSW respectively.
+
+SSH with Private Key
+The environment variable specified will be set to the location of the SSH key file that is temporarily created and two additional environment variables will be automatically defined: MYVARNAME_USR and MYVARNAME_PSW (holding the passphrase).
+
+Unsupported credentials type causes the pipeline to fail with the message: org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException: No suitable binding handler could be found for type <unsupportedType>.
+
+Example-1:
+==========
+
+In this example, We are using 2 options
+
+1) setting a String type of environment variable : FIRSTNAME="sai"
+2) setting the secret text type variable called AN_ACCESS_KEY
+
+FIRSTNAME=sai
+AN_ACCESS_KEY=*****
+
+pipeline {
+    agent any
+    environment {
+        FIRSTNAME="sai"
+     }
+    stages {
+        stage('Example') {
+            environment {
+                AN_ACCESS_KEY = credentials('NAME')
+            }
+            steps {
+                sh 'printenv'
+            }
+        }
+    }
+}
+==
+
+pipeline {
+    agent any
+    environment {
+        a=10
+        b=20
+    }
+    stages {
+        stage('test') {
+            steps {
+                sh '''echo $a
+                    echo $b'''
+            }
+        }
+    }
+}
+
+===
+username and password and SSH Username with private key
+=====================================================
+pipeline {
+    agent any
+    stages {
+        stage('Example Username/Password') {
+            environment {
+                SERVICE_CREDS = credentials('my-predefined-username-password')
+            }
+            steps {
+                sh 'echo "Service user is $SERVICE_CREDS_USR"'
+                sh 'echo "Service password is $SERVICE_CREDS_PSW"'
+                sh 'echo $SERVICE_CREDS'
+            }
+        }
+        stage('Example SSH Username with private key') {
+            environment {
+                SSH_CREDS = credentials('my-predefined-ssh-creds')
+            }
+            steps {
+                sh 'echo "SSH private key is located at $SSH_CREDS"'
+                sh 'echo "SSH user is $SSH_CREDS_USR"'
+                sh 'echo "SSH passphrase is $SSH_CREDS_PSW"'
+            }
+        }
+    }
+}
+
+
+SSH Username with private key
+=====================================================
+pipeline {
+    agent any
+    stages {
+               stage('Example SSH Username with private key') {
+            environment {
+                SSH_CREDS = credentials('SSH_DETAILS')
+            }
+            steps {
+                sh 'echo "SSH private key is located at $SSH_CREDS"'
+                sh 'echo "SSH user is $SSH_CREDS_USR"'
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

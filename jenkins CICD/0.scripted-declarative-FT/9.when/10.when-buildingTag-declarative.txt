@@ -1,0 +1,74 @@
+buildingTag
+===========
+Execute the stage when the build is building a tag. For example: when { buildingTag() }
+
+when-BuildingTag 
+================
+
+https://github.com/bhanuprakash678910/pipeline-buildingtag.git
+
+Here, we have single branch master and a single Jenkins file.
+
+So in here we are specified that the state should only execute when we are building from a tag.
+
+pipeline {
+    agent any
+    stages {
+        stage("Build Master") {
+            when {
+              buildingTag()
+            }
+            steps {
+                echo "Hello World Building Tag"
+            }
+        }
+    }
+  }
+
+Create Multi-branch pipeline job And we are selecting the GitHub as our source.
+
+Note that we have, we have to add in a new behavior.
+
+Discover Tags.
+
+Or the text that we create will not be picked up by Jenkins.
+
+Let's save the job.
+
+So we can see that the master branch is picked up by Jenkins.
+
+Now let's take the master branch.
+
+Okay, so we are now in the master branch.
+
+Let's tag it to be 1.0.
+
+And let's push it to GitHub.
+
+Okay.
+
+So when we go back to GitHub under the release section, we can see that 1.0 is created.
+
+Okay, let's go back to Jenkins and scan the repository.
+
+We can see that he has picked up the 1.0 tag.
+
+And at the same time, you can see that there's a text tab here.
+
+And we've got one tech right here.
+
+So let's do a build for the tag.
+
+So we can see that the the stage was executed.
+
+Now let's do a build for master.
+
+So we can see that the stage was skipped because we're not building from a tag.
+
+"Stage "Build Master" skipped due to when conditional"
+
+when building tags, you will get the Hello World Building Tag message.
+
+
+
+

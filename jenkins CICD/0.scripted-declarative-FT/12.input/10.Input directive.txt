@@ -1,0 +1,120 @@
+input
+======
+
+input
+======
+The input directive on a stage allows you to prompt for input, using the input step.
+
+ The stage will pause after any options have been applied, and before entering the agent block for that stage or evaluating the when condition of the stage. 
+
+If the input is approved, the stage will then continue. 
+
+Any parameters provided as part of the input submission will be available in the environment for the rest of the stage.
+
+Configuration options
+=====================
+
+message
+Required. This will be presented to the user when they go to submit the input.
+
+id
+An optional identifier for this input. The default value is based on the stage name.
+
+ok
+Optional text for the "ok" button on the input form.
+
+submitter
+An optional comma-separated list of users or external group names who are allowed to submit this input. Defaults to allowing any user.
+
+submitterParameter
+An optional name of an environment variable to set with the submitter name, if present.
+
+parameters
+An optional list of parameters to prompt the submitter to provide. 
+
+Example 14. Input Step, Declarative Pipeline
+==============================================
+
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            input {
+                message "Should we continue?"
+                ok "Yes, we should."
+                submitter "alice,bob"
+                parameters {
+                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+                }
+            }
+            steps {
+                echo "Hello, ${PERSON}, nice to meet you."
+            }
+        }
+    }
+}
+
+input-declarative
+==================
+
+pipeline{			
+    agent any
+
+    stages{
+        stage('Build'){	
+			input{
+                    message "Please specify environment:"			
+                    ok "OK"
+					submitter "dummyuser,admin@localhost.com"
+					submitterParameter "whoIsSubmitter"
+                    parameters {
+						string(name: 'environment', defaultValue: 'Dev', description: 'Environment to build for (Valid values: Dev, Test, Prod)')
+						string(name: 'version', defaultValue: '1.0', description: 'Version number to build for')
+						booleanParam(name: 'to_deploy_to_environment', defaultValue: true, description: '')
+						choice(choices: 'US-EAST-1\nUS-WEST-2', description: 'What AWS region?', name: 'region')
+						text(name:'myText', defaultValue:'myTextValue', description:'myText')
+						password(name:'myPassword', defaultValue:'myPasswordValue', description:'myDescription')
+						
+                    }
+                }			
+            			
+            steps{			
+				echo "We are building for ${environment}, ${version}, and we are deploying to environment: ${to_deploy_to_environment}"
+				echo "region:${region}, myText: ${myText}, myPassword: ${myPassword},"
+				echo "submitter is: ${whoIsSubmitter}"
+				echo "selected credentials is: ${myCredentials}"
+			}
+        }			
+    }			
+}				
+
+===
+
+----------
+input-scripted
+----------
+node{
+	def userInput = ""
+	stage('Build') {
+		userInput = input(id: 'userInput',    
+						message: 'Please specify environment',    
+						submitterParameter: "whoIsSubmitter",
+						parameters: [
+							string(name: 'environment', defaultValue: 'Dev', description: 'Environment to build for (Valid values: Dev, Test, Prod)'),
+							string(name: 'version', defaultValue: '1.0', description: 'Version number to build for'),
+							booleanParam(name: 'to_deploy_to_environment', defaultValue: true, description: ''),
+							choice(choices: 'US-EAST-1\nUS-WEST-2', description: 'What AWS region?', name: 'region'),
+							text(name:'myText', defaultValue:'myTextValue', description:'myText'),
+							password(name:'myPassword', defaultValue:'myPasswordValue', description:'myDescription'),
+							file(name:'myFile', description:'fileDescription'),
+							credentials(name:'myCredentials', description:'myCredentailsDesc', required:true)
+						]  
+		)
+	  
+		echo "We are building for ${userInput.environment}, ${userInput.version}, and we are deploying to environment: ${userInput.to_deploy_to_environment}"
+		echo "region:${userInput.region}, myText: ${userInput.myText}, myPassword: ${userInput.myPassword}, and myFile: ${userInput.myFile}"
+		echo "submitter is: ${userInput.whoIsSubmitter}"
+	}
+}
+
+

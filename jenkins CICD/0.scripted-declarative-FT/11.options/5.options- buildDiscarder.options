@@ -1,0 +1,79 @@
+buildDiscarder
+Persist artifacts and console output for the specific number of recent Pipeline runs. For example: options { buildDiscarder(logRotator(numToKeepStr: '1')) }
+
+Strategy= Log Rotation
+
+Days to keep builds = if not empty, build records are only kept up to this number of days
+
+Max # of builds to keep= if not empty, only up to this number of build records are kept
+
+Days to keep artifacts = if not empty, artifacts from builds older than this number of days will be deleted, but the logs, history, reports, etc for the build will be kept.
+
+Max # of builds to keep with artifacts= if not empty, only up to this number of builds have their artifacts retained
+
+This determines when, if ever, build records for this project should be discarded.
+
+ Build records include the console output, archived artifacts, and any other metadata related to a particular build.
+
+Keeping fewer builds means less disk space will be used in the Build Record Root Directory , which is specified on the Configure System screen.
+
+Jenkins offers two options for determining when builds should be discarded:
+
+Build age: discard builds when they reach a certain age; for example, seven days old.
+
+Build count: discard the oldest build when a certain number of builds already exist.
+
+These two options can be active at the same time, so you can keep builds for 14 days, but only up to a limit of 50 builds, for example. 
+
+If either limit is exceeded, then any builds beyond that limit will be discarded.
+
+You can also ensure that important builds are kept forever, regardless of the setting here — click the Keep this build forever button on the build page.
+
+The last stable and last successful build are also excluded from these rules.
+
+In the Advanced section, the same options can be specified, but specifically for build artifacts . 
+
+If enabled, build artifacts will be discarded for any builds which exceed the defined limits. The builds themselves will still be kept; only the associated artifacts, if any, will be deleted.
+
+For example, if a project builds some software and produces a large installer, which is archived, you may wish to always keep the console log and information about which source control commit was built, while for disk space reasons, you may want to keep only the last three installers that were built.
+This can make sense for projects where you can easily recreate the same artifacts later by building the same source control commit again.
+
+Note that Jenkins does not discard items immediately when this configuration is updated, or as soon as any of the configured values are exceeded; these rules are evaluated each time a build of this project completes.
+
+
+scripted pipeline
+=================
+
+node() {
+  properties([buildDiscarder(logRotator(numToKeepStr: '1'))])
+ stage("build") {
+  sh 'echo hello'
+ } 
+}
+
+==
+
+pipeline {
+  agent any
+  options { 
+    buildDiscarder(logRotator(numToKeepStr: '3')) 
+   } 
+  stages {
+    stage("build") {
+       steps {
+         sh 'echo hello'
+      }
+   }
+  }
+}
+==
+node() {
+  properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '7', artifactNumToKeepStr: '5', daysToKeepStr: '3', numToKeepStr: '5'))])
+ stage("init") {
+  sh 'echo hi'
+ } 
+}
+
+===
+
+====

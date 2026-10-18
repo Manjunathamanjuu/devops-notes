@@ -1,0 +1,30 @@
+equals
+=======
+Execute the stage when the expected value is equal to the actual value, for example: 
+
+when { equals expected: 2, actual: currentBuild.number }.
+
+pipeline- when equals
+=====================
+
+pipeline {
+    agent any
+	environment{
+		some_name="sai"
+	}	
+    stages {
+        stage('Build') {
+            when {
+                equals expected: "sai", actual: some_name
+            }
+            steps {
+				echo "${some_name}"
+            }
+        }
+    }
+}
+
+=
+change some_name to john and test pipeline.
+
+Stage "Build" skipped due to when conditional

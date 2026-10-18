@@ -1,0 +1,60 @@
+Evaluating when before the options directive = beforeOptions
+=============================================
+By default, the when condition for a stage will be evaluated after entering the options for that stage, if any are defined. However, this can be changed by specifying the beforeOptions option within the when block. 
+
+If beforeOptions is set to true, the when condition will be evaluated first, and the options will only be entered if the when condition evaluates to true.
+
+beforeOptions true takes precedence over beforeInput true and beforeAgent true.
+
+Valid option types: [catchError, checkoutToSubdirectory, retry, script, skipDefaultCheckout, timeout, timestamps, waitUntil, warnError, withChecks, withContext, withCredentials, withEnv, wrap, ws]
+
+https://github.com/bhanuprakash678910/beforeoptionstest.git
+
+Example 22. beforeOptions
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                beforeOptions true
+                branch 'master'
+            }
+            options {
+                 retry 3
+            }
+            steps {
+                echo "Deploying to master"
+            }
+        }
+    }
+}
+
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                beforeOptions true
+                branch 'testing'
+            }
+            options {
+                 retry 3
+            }
+            steps {
+                echo "Deploying to testing"
+            }
+        }
+    }
+}
+
+modify echo to echoo and test options.

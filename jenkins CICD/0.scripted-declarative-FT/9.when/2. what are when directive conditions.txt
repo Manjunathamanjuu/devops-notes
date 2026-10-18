@@ -1,0 +1,22 @@
+Built-in Conditions
+===================
+1.environment
+2.equals
+3.branch
+4.not
+5.expression
+6.anyOf
+7.allOf
+
+8.tag
+9.buildingTag
+
+10.changelog
+11.changeset
+12.changeRequest
+
+13.triggeredBy
+
+14.beforeAgent
+15.beforeInput
+16.beforeOptions

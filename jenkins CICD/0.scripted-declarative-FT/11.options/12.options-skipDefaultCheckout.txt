@@ -1,0 +1,112 @@
+skipDefaultCheckout
+====================
+
+Skip checking out code from source control by default in the agent directive.
+
+
+skipDefaultCheckout() usecases in jenkins pipeline
+
+skipDefaultCheckout() prevents Jenkins from automatically checking out your SCM source code at the start of a pipeline or stage. 
+
+By default, Jenkins always does a git checkout when a stage begins — this option disables that behavior.
+
+: skip the automatic behavior, then take full manual control of when and what you check out.
+ 
+
+For example: options { skipDefaultCheckout() }
+
+https://github.com/bhanuprakash678910/skipDefaultCheckout.git
+
+
+configure multi branch pipeline for this job.
+
+In below code, we defined options inside stage build.
+
+pipeline {
+    agent none
+
+    stages {
+        stage('Build') {
+			agent any
+			options { 
+				skipDefaultCheckout() 
+			}
+
+            steps {                
+                echo 'Hello World'
+            }
+        }
+    }
+}
+
+observation: checkout not happen and no workspace created.
+
+case2: comment options.
+
+pipeline {
+    agent none
+
+    stages {
+        stage('Build') {
+			agent any
+			/* options { 
+				skipDefaultCheckout() 
+			} */
+
+            steps {                
+                echo 'Hello World'
+            }
+        }
+    }
+}
+
+observation: checkout happens and workspace exists. cat Readme.txt and Hello-1.
+
+case3: uncomment options and modify Readme.txt as Hello-2.
+
+pipeline {
+    agent none
+
+    stages {
+        stage('Build') {
+			agent any
+			 options { 
+				skipDefaultCheckout() 
+			} 
+
+            steps {                
+                echo 'Hello World'
+            }
+        }
+    }
+}
+
+observation:
+============
+checkout not happen and still we see hello-1 in workspace.
+
+Now comment options and rebuild the master.
+checkout happended and text as hello-2.
+
+case: use options at pipeline level and no checkout happens.
+
+
+pipeline {
+    agent any
+    options { 
+	skipDefaultCheckout() 
+    }
+
+    stages {
+        stage('Build') {
+			agent any
+			options { 
+				skipDefaultCheckout() 
+			}
+
+            steps {                
+                echo 'Hello World'
+            }
+        }
+    }
+} 

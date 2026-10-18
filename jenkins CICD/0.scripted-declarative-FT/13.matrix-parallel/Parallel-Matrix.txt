@@ -1,0 +1,426 @@
+https://github.com/bhanuprakash678910/matrix-parallel.git
+
+
+parallel job-1
+==============
+
+pipeline {
+  agent none
+  stages {
+    stage('BuildAndTest') {
+      parallel {
+        stage('redhatserver') {
+          agent {label 'redhat-firefox'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for firefox'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for firefox'
+              }
+            }
+          }
+        }
+        stage('ubuntuserver') {
+          agent {label 'ubuntu-firefox'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for firefox'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for firefox'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+Jenkins-matrix-1
+=================
+
+pipeline {
+  agent none
+  stages {
+    stage('BuildAndTest') {
+      matrix {
+        agent {
+          label "${PLATFORM}"
+        }
+        axes {
+          axis {
+            name 'PLATFORM'
+            values 'redhat-firefox', 'ubuntu-firefox'
+          }
+        }
+        stages {
+          stage('Build') {
+            steps {
+              sh 'echo Do Build for $PLATFORM'
+            }
+          }
+          stage('Test') {
+            steps {
+              sh 'echo Do Test for $PLATFORM'
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+==
+
+Jenkinsfile-2-parallel
+=======================
+pipeline {
+  agent none
+  stages {
+    stage('BuildAndTest') {
+      parallel {
+        stage('redhat1') {
+          agent {label 'redhat-chrome'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for redhat-chrome'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for redhat-chrome'
+              }
+            }
+          }
+        }
+        stage('redhat2') {
+          agent {label 'redhat-firefox'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for redhat-firefox'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for redhat-firefox'
+              }
+            }
+          }
+        }
+        stage('redhat3') {
+          agent {label 'redhat-ie'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for redhat-ie'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for redhat-ie'
+              }
+            }
+          }
+        }
+        stage('ubuntu1') {
+          agent {label 'ubuntu-chrome'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for ubuntu-chrome'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for ubuntu-chrome'
+              }
+            }
+          }
+        }
+        stage('ubuntu2') {
+          agent {label 'ubuntu-firefox'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for ubuntu-firefox'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for ubuntu-firefox'
+              }
+            }
+          }
+        }
+        stage('ubuntu3') {
+          agent {label 'ubuntu-ie'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for ubuntu-ie'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for ubuntu-ie'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+Jenkinsfile-2-matrix
+=====================
+pipeline {
+  agent none
+  stages {
+    stage('BuildAndTest') {
+      matrix {
+        agent {
+          label "${PLATFORM}-${BROWSER}"
+        }
+        axes {
+          axis {
+            name 'PLATFORM'
+            values 'redhat', 'ubuntu'
+          }
+          axis {
+            name 'BROWSER'
+            values 'chrome', 'firefox', 'ie'
+          }
+        }
+        stages {
+          stage('Build') {
+            steps {
+              sh 'echo Do Build for $PLATFORM-$BROWSER'
+            }
+          }
+          stage('Test') {
+            steps {
+              sh 'echo Do Test for $PLATFORM-$BROWSER'
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+==
+Jenkinsfile-3-parallel ( here we removed last stage from previous file: (ubuntu-ie)
+========================
+pipeline {
+  agent none
+  stages {
+    stage('BuildAndTest') {
+      parallel {
+        stage('redhat1') {
+          agent {label 'redhat-chrome'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for redhat-chrome'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for redhat-chrome'
+              }
+            }
+          }
+        }
+        stage('redhat2') {
+          agent {label 'redhat-firefox'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for redhat-firefox'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for redhat-firefox'
+              }
+            }
+          }
+        }
+        stage('redhat3') {
+          agent {label 'redhat-ie'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for redhat-ie'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for redhat-ie'
+              }
+            }
+          }
+        }
+        stage('ubuntu1') {
+          agent {label 'ubuntu-chrome'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for ubuntu-chrome'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for ubuntu-chrome'
+              }
+            }
+          }
+        }
+        stage('ubuntu2') {
+          agent {label 'ubuntu-firefox'}
+          stages {
+            stage('Build') {
+              steps {
+                sh 'echo Do Build for ubuntu-firefox'
+              }
+            }
+            stage('Test') {
+              steps {
+                sh 'echo Do Test for ubuntu-firefox'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+===
+
+Jenkinsfile-3-matrix
+=====================
+
+pipeline {
+  agent none
+  stages {
+    stage('BuildAndTest') {
+      matrix {
+        agent {
+          label "${PLATFORM}-${BROWSER}"
+        }
+        axes {
+          axis {
+            name 'PLATFORM'
+            values 'ubuntu', 'redhat'
+          }
+          axis {
+            name 'BROWSER'
+            values 'chrome', 'firefox', 'ie'
+          }
+        }
+        excludes {
+          exclude {
+            axis {
+                name 'PLATFORM'
+                values 'ubuntu'
+            }
+            axis {
+                name 'BROWSER'
+                values 'ie'
+            }
+          }
+        }
+        stages {
+          stage('Build') {
+            steps {
+              sh 'echo Do Build for $PLATFORM-$BROWSER'
+            }
+          }
+          stage('Test') {
+            steps {
+              sh 'echo Do Test for $PLATFORM-$BROWSER'
+            }
+          }
+        }
+      }
+    }
+  }
+}
+===
+
+pipeline {
+    parameters {
+        choice(name: 'PLATFORM_FILTER', choices: ['all', 'redhat', 'ubuntu'], description: 'Run on specific platform')
+    }
+    agent none
+    stages {
+        stage('BuildAndTest') {
+            matrix {
+                agent {
+                    label "${PLATFORM}"
+                }
+                when { anyOf {
+                    expression { params.PLATFORM_FILTER == 'all' }
+                    expression { params.PLATFORM_FILTER == env.PLATFORM }
+                } }
+                axes {
+                    axis {
+                        name 'PLATFORM'
+                        values 'ubuntu', 'redhat'
+                    }
+                    axis {
+                        name 'BROWSER'
+                        values 'firefox', 'chrome', 'ie'
+                    }
+                }
+                excludes {
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            values 'redhat'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'firefox'
+                        }
+                    }
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            notValues 'redhat'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'ie'
+                        }
+                    }
+                }
+                stages {
+                    stage('Build') {
+                        steps {
+                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                    stage('Test') {
+                        steps {
+                            echo "Do Test for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

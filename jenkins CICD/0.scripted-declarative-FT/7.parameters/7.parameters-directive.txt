@@ -1,0 +1,137 @@
+parameters
+===========
+The parameters directive provides a list of parameters that a user should provide when triggering the Pipeline. The values for these user-specified parameters are made available to Pipeline steps via the params object, refer to the Parameters, Declarative Pipeline for its specific usage.
+
+Each parameter has a Name and Value, depending on the parameter type. This information is exported as environment variables when the build starts, allowing subsequent parts of the build configuration to access those values. For example, use the ${PARAMETER_NAME} syntax with POSIX shells like bash and ksh, the ${Env:PARAMETER_NAME} syntax with PowerShell, or the %PARAMETER_NAME% syntax with Windows cmd.exe.
+
+Required= No
+
+Parameters= None
+
+Allowed= Only once, inside the pipeline block.
+
+Available Parameters
+====================
+string
+A parameter of a string type, for example: parameters { string(name: 'DEPLOY_ENV', defaultValue: 'staging', description: '') }.
+
+text
+A text parameter, which can contain multiple lines, for example: parameters { text(name: 'DEPLOY_TEXT', defaultValue: 'One\nTwo\nThree\n', description: '') }.
+
+booleanParam
+A boolean parameter, for example: parameters { booleanParam(name: 'DEBUG_BUILD', defaultValue: true, description: '') }.
+
+choice
+A choice parameter, for example: parameters { choice(name: 'CHOICES', choices: ['one', 'two', 'three'], description: '') }. The first value is the default.
+
+password
+A password parameter, for example: parameters { password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'A secret password') }.
+
+==
+
+Parameters, Declarative Pipeline
+================================
+pipeline {
+    agent any
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+
+        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo "Hello ${params.PERSON}"
+
+                echo "Biography: ${params.BIOGRAPHY}"
+
+                echo "Toggle: ${params.TOGGLE}"
+
+                echo "Choice: ${params.CHOICE}"
+
+                echo "Password: ${params.PASSWORD}"
+            }
+        }
+    }
+}
+====
+
+====
+pipeline {							
+    agent any							
+    parameters {							
+        string(name: 'environment', defaultValue: 'Dev', description: 'Environment to build for (Valid values: Dev, Test, Prod)')
+		string(name: 'version', defaultValue: '1.0', description: 'Version number to build for')
+		booleanParam(name: 'to_deploy_to_environment', defaultValue: true, description: '')
+		choice(choices: 'US-EAST-1\nUS-WEST-2', description: 'What AWS region?', name: 'region')
+		text(name:'myText', defaultValue:'myTextValue', description:'myText')
+		password(name:'myPassword', defaultValue:'myPasswordValue', description:'myDescription')
+		file(name:'myFile', description:'fileDescription')
+		credentials(name:'myCredentials', description:'myCredentailsDesc', required:true)					
+    }							
+    stages {							
+        stage('Example') {							
+            steps {							
+                echo "We are building for ${params.environment}, ${params.version}, and we are deploying to environment: ${params.to_deploy_to_environment}"
+				echo "region:${params.region}, myText: ${params.myText}, myPassword: ${params.myPassword}, and myFile: ${params.myFile}"
+				echo "selected credentials is: ${params.myCredentials}"
+            }							
+        }							
+    }							
+}	
+
+===
+
+parameters - scripted
+=====================
+
+node() {
+   // adds job parameters within jenkinsfile
+   properties([
+     parameters([
+       string(
+         defaultValue: 'Dev',
+         description: 'Environment to build for (Valid values: Dev, Test, Prod)',
+         name: 'environment'
+       ),
+       booleanParam(
+         defaultValue: true,
+         description: '',
+         name: 'to_deploy_to_environment'
+       ),
+	   choice(
+		choices: 'US-EAST-1\nUS-WEST-2', 
+		description: 'What AWS region?', 
+		name: 'region'
+		),
+	   text(
+	   name:'myText', 
+	   defaultValue:'myTextValue', 
+	   description:'myText'
+	   ),
+	   password(
+	   name:'myPassword', 
+	   defaultValue:'myPasswordValue', 
+	   description:'myDescription'
+	   ),
+	   file(
+	   name:'myFile', 
+	   description:'fileDescription'
+	   ),
+	   credentials(
+	   name:'myCredentials', 
+	   description:'myCredentailsDesc', 
+	   required:true)			   
+     ])
+   ])
+   
+    echo "We are building for ${params.environment}, and we are deploying to environment: ${params.to_deploy_to_environment}"
+	echo "region:${params.region}, myText: ${params.myText}, myPassword: ${params.myPassword}, and myFile: ${params.myFile}"
+	echo "selected credentials is: ${params.myCredentials}"
+}						

@@ -1,0 +1,230 @@
+Email Notification-post always
+==============================
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                echo "Hello world"
+                    }
+            }
+        }
+    post{
+        always{
+            mail to: "bhanuprakashdevopsaws2019k@gmail.com",
+            subject: "Test Email",
+            body: "test"
+        }
+    }
+}
+
+Email Notification-post failure
+================================
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                echoo "Hello world"
+                    }
+            }
+        }
+    post{
+        failure{
+            mail to: "bhanuprakashdevopsaws2019k@gmail.com",
+            subject: "jenkins build:${currentBuild.currentResult}: ${env.JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\nMore Info can be found here: ${env.BUILD_URL}"
+        }
+    }
+}
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                echo "Hello world"
+                    }
+            }
+        }
+    post{
+        always{
+            mail to: "bhanuprakashdevopsaws2019k@gmail.com",
+            subject: "Test Email",
+            body: "test"
+        }
+    }
+}
+==
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                echoo "Hello world"
+                    }
+            }
+        }
+    post{
+        failure{
+            mail to: "bhanuprakashdevopsaws2019k@gmail.com",
+            subject: "jenkins build:${currentBuild.currentResult}: ${env.JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\nMore Info can be found here: ${env.BUILD_URL}"
+        }
+    }
+}
+
+===
+pipeline {
+  agent {
+    docker {
+        image 'maven:3.9.0-eclipse-temurin-11'
+        alwaysPull true
+        args '-e env=dev'
+        customWorkspace '/var/lib/jenkins/workspace/custom'
+    }
+  }
+  stages {
+    stage('build'){
+       steps {
+         sh 'echo $env'
+       }
+     }
+  }
+}
+
+Email Notification:-
+================
+
+Email notifications through Jenkins:-
+============================
+1. Open the dashboard of Jenkins
+2. Go to the job for which we want email notifications
+3. Click on configure
+4. Go to post build action
+
+5. Click on post build actions
+6. Click on email notification
+
+7. Enter email ID's of team members separated by space
+
+8. Apply--> same
+9. Go to the dashboard of Jenkins
+10. Click on manage Jenkins
+11. Click on configure system
+12. Go to email notification
+	SMTP server 	smtp.gmail.com
+	Default user email
+13. Click on advanced
+	Click use SMTP authentication
+	Enter your Gmail username and password
+14. Click on use SSL
+15. SMTP port 465
+16. Check on test configuration by test email and enter your gmail ID
+17. Click on test configuration
+
+
+Error:
+======
+jakarta.mail.AuthenticationFailedException: 534-5.7.9 Application-specific password required. For more information, go to
+534 5.7.9  https://support.google.com/mail/?p=InvalidSecondFactor 6a1803df08f44-8971cc8247bsm178058356d6.6 - gsmtp
+
+	at PluginClassLoader for jakarta-mail-api//org.eclipse.angus.mail.smtp.SMTPTransport$Authenticator.authenticate(SMTPTransport.java:954)
+	at PluginClassLoader for jakarta-mail-api//org.eclipse.angus.mail.smtp.SMTPTransport.authenticate(SMTPTransport.java:865)
+	at PluginClassLoader for jakarta-mail-api//org.eclipse.angus.mail.smtp.SMTPTransport.protocolConnect(SMTPTransport.java:769)
+	at PluginClassLoader for jakarta-mail-api//jakarta.mail.Service.connect(Service.java:367)
+	at PluginClassLoader for jakarta-mail-api//jakarta.mail.Service.connect(Service.java:225)
+	at PluginClassLoader for jakarta-mail-api//jakarta.mail.Service.connect(Service.java:174)
+	at PluginClassLoader for jakarta-mail-api//jakarta.mail.Transport.send0(Transport.java:232)
+	at PluginClassLoader for jakarta-mail-api//jakarta.mail.Transport.send(Transport.java:102)
+	at PluginClassLoader for mailer//hudson.tasks.Mailer$DescriptorImpl.doSendTestMail(Mailer.java:712)
+	at java.base/java.lang.invoke.MethodHandle.invokeWithArguments(MethodHandle.java:733)
+
+zedl hqxp kgfl nczq
+
+
+Email sent successfully :-
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                // your build steps
+            }
+        }
+    }
+
+    post {
+        failure {
+            script {
+                def buildNumber = env.BUILD_NUMBER
+                def jobName = env.JOB_NAME
+                def buildUrl = env.BUILD_URL
+                def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
+
+                // Archive logs as attachment
+                archiveArtifacts artifacts: '**/target/*.log, **/logs/*.log', 
+                                 allowEmptyArchive: true
+
+                // Email notification with attachment
+                emailext(
+                    subject: "❌ BUILD FAILED: ${jobName} - Build #${buildNumber}",
+                    body: """
+                        <html>
+                        <body>
+                            <h2 style="color:red;">Build Failed!</h2>
+                            <table>
+                                <tr><td><b>Job Name:</b></td><td>${jobName}</td></tr>
+                                <tr><td><b>Build Number:</b></td><td>#${buildNumber}</td></tr>
+                                <tr><td><b>Build URL:</b></td><td><a href="${buildUrl}">${buildUrl}</a></td></tr>
+                                <tr><td><b>Timestamp:</b></td><td>${timestamp}</td></tr>
+                                <tr><td><b>Status:</b></td><td style="color:red;">FAILURE</td></tr>
+                            </table>
+                            <p>Please check the attached console log for more details.</p>
+                        </body>
+                        </html>
+                    """,
+                    mimeType: 'text/html',
+                    to: 'team@example.com',
+                    attachLog: true,                          // attaches console log
+                    attachmentsPattern: '**/target/*.log'     // attaches additional logs
+                )
+            }
+        }
+
+        always {
+            script {
+                // Always archive test results if present
+                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+            }
+        }
+
+        success {
+            echo "✅ Build #${env.BUILD_NUMBER} passed successfully."
+        }
+
+        unstable {
+            emailext(
+                subject: "⚠️ BUILD UNSTABLE: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                body: """
+                    Build #${env.BUILD_NUMBER} is unstable.
+                    Check details at: ${env.BUILD_URL}
+                """,
+                to: 'team@example.com',
+                attachLog: true
+            )
+        }
+    }
+}
+
+
+
+
+
+
+
+
+

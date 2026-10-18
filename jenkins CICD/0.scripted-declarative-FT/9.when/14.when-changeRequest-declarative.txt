@@ -1,0 +1,45 @@
+changeRequest
+==============
+Executes the stage if the current build is for a "change request" (a.k.a. Pull Request on GitHub and Bitbucket, Merge Request on GitLab, Change in Gerrit, etc.). When no parameters are passed the stage runs on every change request, for example: 
+
+when { changeRequest() }.
+
+By adding a filter attribute with parameter to the change request, the stage can be made to run only on matching change requests. Possible attributes are id, target, branch, fork, url, title, author, authorDisplayName, and authorEmail. Each of these corresponds to a CHANGE_* environment variable, for example: 
+
+when { changeRequest target: 'master' }.
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: * EQUALS for a simple string comparison (the default) * GLOB for an ANT style path glob (same as for example changeset) * REGEXP for regular expression matching
+
++ Example: 
+
+when { changeRequest authorEmail: "[\\w_-.]+@example.com", comparator: 'REGEXP' }
+
+https://github.com/bhanuprakash678910/when-changerequest.git
+
+whenver we create a multibranch pipeline for this GIT URL, both dev and main does not executed the stage build.
+
+pipeline {
+    agent any
+    stages {
+        stage("Build") {
+                       when {
+                          changeRequest( target: 'main' )
+                        }
+            steps {
+                echo "Hello World change Request"
+              }
+        }
+    }
+}
+
+Now do changes in dev and create PR to main and merge it.
+
+"Hello World change Request"
+
+try this with multibranch pipeline
+
+
+
+
+
+

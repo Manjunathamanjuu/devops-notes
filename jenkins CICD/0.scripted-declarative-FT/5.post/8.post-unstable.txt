@@ -1,0 +1,24 @@
+unstable
+---------
+Only run the steps in post if the current Pipeline’s run has an "unstable" status, usually caused by test failures, code violations, etc. This is typically denoted by yellow in the web UI.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"					
+					script{
+						currentBuild.result = 'UNSTABLE'
+					}
+            }
+        }
+    }
+    post{
+		//Only run the steps in post if the current Pipeline’s or stage’s run has an "unstable" status, usually caused by test failures, code violations, etc. 
+		unstable { 
+                 echo 'post->unstable is called'
+               }
+    }
+}
+==

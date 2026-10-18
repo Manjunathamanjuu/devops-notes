@@ -1,0 +1,62 @@
+checkoutToSubdirectory
+=======================
+Perform the automatic source control checkout in a subdirectory of the workspace.
+
+In Jenkins, the checkoutToSubdirectory step allows you to specify a subdirectory within your workspace where you want to check out your source code. 
+
+This can be useful if you want to organize your workspace with multiple repositories or if you want to control the location of your source code within the workspace.
+
+For example: options { checkoutToSubdirectory('foo') }
+
+create job like pipe100. 
+
+node() {
+  
+ ws("/var/lib/jenkins/workspace/pipe100/dir1"){
+
+    checkout scmGit(branches: [[name: '*/master']],userRemoteConfigs: [[url: 'https://github.com/bhanuprakash678910/mavenproj']])
+ stage("build") {
+  sh '''sleep 10 
+        echo hello '''
+    }
+  } 
+}
+
+
+
+node() {
+  
+ ws("/var/lib/jenkins/workspace/pipe100/pipeline"){
+
+    checkout scmGit(branches: [[name: '*/master']],userRemoteConfigs: [[url: 'https://github.com/bhanuprakash678910/jenkinspipeline.git']])
+ stage("build") {
+  sh '''sleep 10 
+        echo hello '''
+    }
+  } 
+}
+
+===
+
+create or use : https://github.com/bhanuprakash678910/checkouttosubdirectory.git
+
+create testmul - multibranch pipeline and 
+
+pipeline {
+  agent any
+  options { checkoutToSubdirectory('somedir') }
+  stages {
+    stage("checkout") {
+       steps {
+         sh 'echo hello world'
+      }
+   }
+  }
+}
+
+==
+
+
+
+
+

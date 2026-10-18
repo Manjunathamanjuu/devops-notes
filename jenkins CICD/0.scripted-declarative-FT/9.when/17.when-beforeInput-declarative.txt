@@ -1,0 +1,65 @@
+Evaluating when before the input directive = beforeInput
+===========================================
+By default, the when condition for a stage will not be evaluated before the input, if one is defined. However, this can be changed by specifying the beforeInput option within the when block. 
+
+If beforeInput is set to true, the when condition will be evaluated first, and the input will only be entered if the when condition evaluates to true.
+
+beforeInput true takes precedence over beforeAgent true.
+
+The beforeInput step in Jenkins is used to define a block of code that will be run before the input step is executed. This can be useful for performing setup or validation tasks before prompting the user for input.
+
+Example 21. beforeInput
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                beforeInput true
+                branch 'production'
+            }
+            input {
+                message "Deploy to production?"
+                id "simple-input"
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+==
+https://github.com/bhanuprakash678910/beforeInputtest.git
+
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                beforeInput true
+                branch 'production'
+            }
+            input {
+                message "Deploy to production?"
+                id "simple-input"
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+
+if branch condition matches to production, then only input prompt will be prompted.
+
+

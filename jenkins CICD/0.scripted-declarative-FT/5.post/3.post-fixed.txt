@@ -1,0 +1,22 @@
+fixed
+======
+Only run the steps in post if the current Pipeline’s run is successful and the previous run failed or was unstable.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s run is successful and the previous run failed or was unstable.
+		fixed { 
+            echo 'post->fixed is called'
+        }
+    }
+}
+
+==

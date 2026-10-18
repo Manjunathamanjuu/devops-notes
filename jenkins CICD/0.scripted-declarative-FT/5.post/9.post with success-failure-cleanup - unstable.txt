@@ -1,0 +1,48 @@
+post with success-failure-cleanup - unstable
+=============================================
+success
+Only run the steps in post if the current Pipeline’s or stage’s run has a "success" status, typically denoted by blue or green in the web UI.
+
+failure
+Only run the steps in post if the current Pipeline’s or stage’s run has a "failed" status, typically denoted by red in the web UI.
+
+cleanup
+Run the steps in this post condition after every other post condition has been evaluated, regardless of the Pipeline or stage’s status.
+
+unstable
+Only run the steps in post if the current Pipeline’s run has an "unstable" status, usually caused by test failures, code violations, etc. This is typically denoted by yellow in the web UI.
+
+
+pipeline {
+    agent any
+    stages {
+        stage('Example1') {
+            steps {
+                sh 'touch file1'
+            }
+        }
+         stage('Example2') {
+            steps {
+                sh 'touch file2'
+            }
+        }
+         stage('Example3') {
+            steps {
+                sh 'touch file3'
+            }
+        }
+    }
+    post { 
+        success { 
+            echo 'I am successful!'
+        }
+        failure { 
+            echo 'I am failure!'
+         }
+        cleanup { 
+            sh 'rm -r file1'
+         }
+    }
+}
+
+==

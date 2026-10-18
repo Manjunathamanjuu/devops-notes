@@ -1,0 +1,65 @@
+regression
+-----------
+Only run the steps in post if the current Pipeline’s or status is failure, unstable, or aborted and the previous run was successful.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+		    //error("Build failed")
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s status is failure, unstable, or aborted and the previous run was successful.
+		regression { 
+            echo 'post->regression is called'
+        }
+    }
+}
+==
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+		    error("Build failed")
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s status is failure, unstable, or aborted and the previous run was successful.
+		regression { 
+            echo 'post->regression is called'
+        }
+    }
+}
+
+Here post-regression wont execute.
+
+uncomment errror message to mark current stage as failure and  previous run is successful.
+
+pipeline{
+    agent any
+    stages{
+        stage('Build'){
+            steps{
+                    echo "building"
+		    error("Build failed")
+            }
+        }
+    }
+    post{
+		//Only runs if the current Pipeline’s or stage’s status is failure, unstable, or aborted and the previous run was successful.
+		regression { 
+            echo 'post->regression is called'
+        }
+    }
+}
+
+
+
