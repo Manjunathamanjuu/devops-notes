@@ -1,0 +1,45 @@
+If supported by your backend, Terraform will lock your state for all operations that could write state. This prevents others from acquiring the lock and potentially corrupting your state.
+
+State locking happens automatically on all operations that could write state. 
+You won't see any message that it is happening. 
+
+If state locking fails, Terraform will not continue. You can disable state locking for most commands with the -lock flag but it is not recommended.
+
+If acquiring the lock is taking longer than expected, Terraform will output a status message. 
+
+If Terraform doesn't output a message, state locking is still occurring if your backend supports it.
+
+Not all backends support locking. 
+
+The documentation for each backend includes details on whether it supports locking or not.
+
+
+$ terraform.exe init -reconfigure
+
+
+$ terraform.exe apply
+Acquiring state lock. This may take a few moments...
+╷
+│ Error: Error acquiring the state lock
+│
+│ Error message: operation error DynamoDB: PutItem, https response error StatusCode: 400, RequestID:
+│ J1QO8P0VG7DBKS2LKT81ADV88VVV4KQNSO5AEMVJF66Q9ASUAAJG, ConditionalCheckFailedException: The conditional request
+│ failed
+│ Lock Info:
+│   ID:        3486b2f5-3289-e34e-5bcf-7480d977718c
+│   Path:      bhanu-terraform-remote-state/prod/state/terraform.tfstate
+│   Operation: OperationTypeApply
+│   Who:       BHANUSUMA\bhanu@BhanuSuma
+│   Version:   1.10.5
+│   Created:   2025-03-07 02:41:12.442736 +0000 UTC
+│   Info:
+│
+│
+│ Terraform acquires a state lock to protect the state from being written
+│ by multiple users at the same time. Please resolve the issue above and try
+│ again. For most commands, you can disable locking with the "-lock=false"
+│ flag, but this is not recommended.
+
+
+ terraform.exe plan -lock=false
+
